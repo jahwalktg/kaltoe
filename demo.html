@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>움직이는 사용법 — 칼퇴용 뚝딱 사무도구</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="app.css?v=6">
+<link rel="stylesheet" href="demo.css?v=1">
+<script>try{var t=localStorage.getItem('kaltoe.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body class="dm">
+<header class="dmh"><span id="dmIcon"></span><h1 id="dmT"></h1><span class="dmk">움직이는 사용법</span><span class="sp"></span><label class="dma"><input type="checkbox" id="dmAuto"> 이어서 재생</label><button type="button" class="act" id="dmClose">창 닫기</button></header>
+<main class="dms" id="stage">
+  <div class="dmf" id="fit"><iframe id="fr" title="사용법을 보여 주는 화면(연습용)" tabindex="-1"></iframe><div class="dmg" aria-hidden="true"></div></div>
+  <div class="dmring" id="ring" hidden></div>
+  <div class="dmcur" id="cur" aria-hidden="true" hidden><svg viewBox="0 0 24 24" width="34" height="34"><path d="M4 2l15 9-6.5 1.6L9.6 19z" fill="#fff" stroke="#1d2b2d" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  <div class="dmkey" id="key" hidden></div>
+  <div class="dmscene" id="scene" hidden></div>
+</main>
+<footer class="dmc">
+  <p class="dmcap" id="cap" role="status" aria-live="polite"></p>
+  <div class="dmb"><button type="button" class="act" id="first">처음부터</button><button type="button" class="act" id="prev">◀ 이전</button><span class="dots" id="dots"></span><span class="cntx" id="cnt"></span><button type="button" class="nextb" id="next">다음 ▶</button></div>
+  <p class="dmn">연습용 화면이에요. 내 파일·메모는 건드리지 않고, 실제로 내려받거나 인쇄하지 않아요. <span class="kb">→ 또는 스페이스: 다음 · ←: 이전</span></p>
+</footer>
+<script src="tools.js?v=6"></script>
+<script src="icons.js?v=2"></script>
+<script src="demos.js?v=1"></script>
+<script src="demo.js?v=1"></script>
+</body>
+</html>

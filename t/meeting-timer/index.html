@@ -199,8 +199,8 @@ code{padding:1px 5px;border-radius:5px;background:var(--bg);border:1px solid var
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ai-link{border-color:var(--blue);color:var(--blue)}}
 :root[data-theme="dark"] .ai-link{border-color:var(--blue);color:var(--blue)}
 </style>
-<link rel="stylesheet" href="../../frame.css">
-<script src="../../frame.js"></script>
+<link rel="stylesheet" href="../../frame.css?v=2">
+<script src="../../frame.js?v=2"></script>
 </head>
 <body>
 <div class="page">
@@ -306,7 +306,7 @@ code{padding:1px 5px;border-radius:5px;background:var(--bg);border:1px solid var
     <h2 id="usesTitle">이럴 때 좋아요</h2>
     <ul>
       <li><strong>팀장</strong> 주간 회의가 매번 길어질 때. 안건마다 분을 정하고 회의실 화면에 크게 띄워 두면, 색이 바뀔 때 결론부터 정리하게 됩니다.</li>
-      <li><strong>총무 담당</strong> 사례회의에서 첫 사례에 시간을 다 쓸 때. 사례마다 시간을 나눠 두면 뒤 사례도 논의할 수 있습니다.</li>
+      <li><strong>총무 담당</strong> 팀장회의에서 첫 사례에 시간을 다 쓸 때. 사례마다 시간을 나눠 두면 뒤 사례도 논의할 수 있습니다.</li>
       <li><strong>교육·행사 담당</strong> 참석자 회의가 공지 전달로만 끝날 때. "건의와 어려운 점" 시간을 따로 잡아 두면 이야기를 들을 자리가 생깁니다.</li>
     </ul>
   </section>
@@ -674,7 +674,7 @@ var FACES={"ready":"data:image/webp;base64,UklGRng7AABXRUJQVlA4WAoAAAAQAAAApwAAp
   var KEY='kaltoe.meeting-timer.v1';
   var PRESETS=[
     {label:'주간 직원회의',items:[['지난주 결정 사항 확인',5],['팀별 진행 상황 공유',10],['논의할 안건',10],['다음 주 일정과 공지',5]]},
-    {label:'사례회의',items:[['사례 개요 공유',5],['사례 1 논의',15],['사례 2 논의',15],['역할 나누기와 다음 일정',5]]},
+    {label:'팀장회의',items:[['사례 개요 공유',5],['사례 1 논의',15],['사례 2 논의',15],['역할 나누기와 다음 일정',5]]},
     {label:'팀 회의',items:[['지난주 일과 이번 주 계획 공유',5],['업무 나누기',7],['건의와 어려운 점',5],['안전 수칙과 공지',3]]}
   ];
   var setFace=JT.faceSetter(FACES);

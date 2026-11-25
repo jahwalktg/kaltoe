@@ -292,8 +292,8 @@ code{padding:1px 5px;border-radius:5px;background:var(--bg);border:1px solid var
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ai-link{border-color:var(--blue);color:var(--blue)}}
 :root[data-theme="dark"] .ai-link{border-color:var(--blue);color:var(--blue)}
 </style>
-<link rel="stylesheet" href="../../frame.css">
-<script src="../../frame.js"></script>
+<link rel="stylesheet" href="../../frame.css?v=2">
+<script src="../../frame.js?v=2"></script>
 </head>
 <body>
 <div class="page">
@@ -373,7 +373,7 @@ code{padding:1px 5px;border-radius:5px;background:var(--bg);border:1px solid var
     <ul>
       <li><strong>교육 결과 보고</strong> 만족도 집계를 붙이면 "긍정 응답 81.3%, 평균 4.13점" 같은 문장과 개선 제안이 함께 나옵니다.</li>
       <li><strong>부서장 회의 자료</strong> 분량을 "짧게"로 두면 안건 요약에 넣을 다섯 줄이 나옵니다.</li>
-      <li><strong>시군구 제출</strong> "공문체"로 받으면 실적 보고서 문단에 바로 옮깁니다.</li>
+      <li><strong>외부 제출</strong> "공문체"로 받으면 실적 보고서 문단에 바로 옮깁니다.</li>
     </ul>
   </section>
 
@@ -738,14 +738,14 @@ var FACES={"ready":"data:image/webp;base64,UklGRro5AABXRUJQVlA4WAoAAAAQAAAApwAAp
   var $=JT.$;
   var KEY='kaltoe.prompt-survey.v1';
   var setFace=JT.faceSetter(FACES);
-  var TOS=[['internal','회사 내부'],['board','부서장 회의'],['gov','시군구 제출']];
+  var TOS=[['internal','회사 내부'],['board','부서장 회의'],['gov','외부 제출']];
   var LENS=[['short','짧게 (5~8줄)'],['mid','보통 (문항별 한 문단)'],['long','자세히 (표 포함)']];
   function fresh(){return {name:'',who:'',to:'internal',len:'mid'};}
   function norm(o){o=o||{};return {name:String(o.name||'').slice(0,40),who:String(o.who||'').slice(0,60),to:TOS.some(function(t){return t[0]===o.to;})?o.to:'internal',len:LENS.some(function(l){return l[0]===o.len;})?o.len:'mid'};}
   var DB=JT.store(KEY);var S=(function(){var o=DB.read();return o&&typeof o.to==='string'?norm(o):fresh();})();
   function save(){DB.write(S);}
   function prompt(){
-    var src=$('vSrc').value.trim(),to={internal:'회사 내부 공유용',board:'부서장 회의 보고용',gov:'시군구 제출 실적 보고서용'}[S.to],len={short:'전체 5~8줄 안으로, 요약 중심으로.',mid:'요약 3줄 + 문항별 한 문단 + 개선 제안 3개.',long:'요약 + 문항별 해석 + 응답 분포 표(문항 | 긍정 % | 평균) + 개선 제안 3개 + 다음 조사 때 보완할 문항 제안.'}[S.len];
+    var src=$('vSrc').value.trim(),to={internal:'회사 내부 공유용',board:'부서장 회의 보고용',gov:'외부 제출 실적 보고서용'}[S.to],len={short:'전체 5~8줄 안으로, 요약 중심으로.',mid:'요약 3줄 + 문항별 한 문단 + 개선 제안 3개.',long:'요약 + 문항별 해석 + 응답 분포 표(문항 | 긍정 % | 평균) + 개선 제안 3개 + 다음 조사 때 보완할 문항 제안.'}[S.len];
     return '당신은 회사의 보고서를 돕는 담당자입니다. 아래 [자료]는 "'+(S.name.trim()||'설문 조사')+'"의 집계 결과입니다.'+(S.who.trim()?' 대상·기간: '+S.who.trim()+'.':'')+' 이 글은 '+to+'입니다.\n\n'
       +'해 주세요:\n'
       +'1. 결과를 한눈에 보는 요약 3줄을 먼저 쓰세요(응답자 수, 전체 만족 경향, 가장 눈에 띄는 점).\n'
@@ -784,7 +784,7 @@ var FACES={"ready":"data:image/webp;base64,UklGRro5AABXRUJQVlA4WAoAAAAQAAAApwAAp
 })();
 </script>
 <script src="../ai-kit.js"></script>
-<script>AIK.attach();</script>
+
 <script src="../sample.js"></script>
 </body>
 </html>

@@ -3,3 +3,9 @@
 .crumb{display:none!important}
 .kt-in footer,.kt-in .foot,.kt-in .jt-vid{display:none!important}
 .kt-in body{padding-top:0}
+.kt-how{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;border:2px solid #0f6b66;background:#e3f0ee;color:#0b4f4b;font:inherit;font-size:15px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap}
+.kt-how:hover{background:#d2e7e3}
+.kt-how:focus-visible{outline:3px solid #ffb454;outline-offset:2px}
+:root[data-theme="dark"] .kt-how{background:rgba(108,199,191,.16);border-color:#6cc7bf;color:#cdeeea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kt-how{background:rgba(108,199,191,.16);border-color:#6cc7bf;color:#cdeeea}}
+@media print{.kt-how{display:none!important}}

@@ -133,7 +133,7 @@
     sel.value = String(year);
     sel.addEventListener('change', function () { var y = +sel.value; lsSet(y === auto() ? null : y); location.reload(); });
     lab.appendChild(document.createTextNode(' ')); lab.appendChild(sel); row.appendChild(lab);
-    var st2 = document.createElement('span'); st2.innerHTML = (year === auto() ? '<small>오늘 날짜 기준 자동</small>' : '<small>직접 고름 · </small>') + ' <a href="' + base() + 'rates/index.html">기준값 표 보기</a>';
+    var st2 = document.createElement('span'); st2.innerHTML = (year === auto() ? '<small>오늘 날짜 기준 자동</small>' : '<small>직접 고름 · </small>') + '';
     row.appendChild(st2); box.appendChild(row);
     var fb = used.map(function (k) { var i = info(k); return i && i.fallback ? (KEYS[k] ? KEYS[k].label : k) + ' → ' + i.year + '년 값' : null; }).filter(Boolean);
     if (fb.length) { var p = document.createElement('p'); p.className = 'fb'; p.textContent = year + '년 값이 아직 확인되지 않아 지난해 값을 쓰는 항목: ' + fb.join(', ') + '. 새해 지침이 나오면 바뀝니다. 지금은 화면에서 직접 고쳐 쓰세요.'; box.appendChild(p); }

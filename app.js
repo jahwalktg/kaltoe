@@ -38,7 +38,7 @@
       var s = el('section', 'ag'), ul = el('ul'); s.append(groupHead('h2', c, ts.length), ul);
       ts.forEach(function (t) {
         var li = el('li'), a = el('a'), st = star(t, fav), w = el('p', 'aw'), nm = el('div', 'an'); a.href = '#' + t.id; st.setAttribute('data-k', 's' + t.id);
-        nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(window.KT_ICON(t.id), nm, w); li.append(a, st); ul.append(li);
+        nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(window.KT_ICON(t.id), nm, w); var hb = el('button', 'howb', '▶ 사용법'); hb.type = 'button'; hb.setAttribute('aria-label', t.t + ' 움직이는 사용법 보기'); hb.addEventListener('click', function () { window.KT_DEMO(t.id); }); li.append(a, hb, st); ul.append(li);
       });
       box.append(s);
     });
@@ -133,6 +133,11 @@
   window.addEventListener('hashchange', route);
   $('homeLink').addEventListener('click', function (e) { e.preventDefault(); location.hash = ''; });
   window.KT_OPEN = function (id) { location.hash = id; };
+  /* 움직이는 사용법: 도구 화면(경로)이나 전체 보기(id)에서 — 따로 뜨는 창 하나를 돌려 씀 */
+  window.KT_DEMO = function (x) {
+    var m = String(x).match(/\/t\/(.+)$/), id = m ? PATH[m[1].replace(/\/$/, '/index.html')] : x; if (!id || !ALL[id]) return;
+    var w = window.open('demo.html?id=' + encodeURIComponent(id), 'kaltoe-demo', 'popup,width=1240,height=' + Math.min(900, screen.availHeight - 60)); if (w) w.focus(); else alert('사용법 창이 막혔어요. 주소창 옆의 팝업 차단을 풀고 다시 눌러 주세요.');
+  };
   window.name = window.name || 'kaltoe-main';
   window.addEventListener('beforeunload', function (e) { if (opened.some(function (o) { return o.dirty; })) e.preventDefault(); });
 
@@ -163,7 +168,7 @@
         var w = await window.documentPictureInPicture.requestWindow({ width: 330, height: 640 });
         pip = w; var dd = w.document; dd.documentElement.lang = 'ko'; dd.title = '칼퇴 작은 창';
         var th = document.documentElement.getAttribute('data-theme'); if (th) dd.documentElement.setAttribute('data-theme', th);
-        ['app.css?v=5', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
+        ['app.css?v=6', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
         dd.body.className = 'mini-win'; var box = dd.createElement('div'); dd.body.append(box);
         var off = M.mount(box, { open: function (id) { window.focus(); window.KT_OPEN(id); } });
         setAway(true); w.addEventListener('pagehide', function () { off(); pip = null; setAway(false); });
