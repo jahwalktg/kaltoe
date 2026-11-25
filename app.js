@@ -136,7 +136,7 @@
   /* 움직이는 사용법: 도구 화면(경로)이나 전체 보기(id)에서 — 따로 뜨는 창 하나를 돌려 씀 */
   window.KT_DEMO = function (x) {
     var m = String(x).match(/\/t\/(.+)$/), id = m ? PATH[m[1].replace(/\/$/, '/index.html')] : x; if (!id || !ALL[id]) return;
-    var w = window.open('demo.html?id=' + encodeURIComponent(id), 'kaltoe-demo', 'popup,width=1240,height=' + Math.min(900, screen.availHeight - 60)); if (w) w.focus(); else alert('사용법 창이 막혔어요. 주소창 옆의 팝업 차단을 풀고 다시 눌러 주세요.');
+    var w = window.open(new URL('demo.html?id=' + encodeURIComponent(id), location.href.split('#')[0]).href, 'kaltoe-demo', 'popup,width=1240,height=' + Math.min(900, screen.availHeight - 60)); if (w) w.focus(); else alert('사용법 창이 막혔어요. 주소창 옆의 팝업 차단을 풀고 다시 눌러 주세요.');
   };
   window.name = window.name || 'kaltoe-main';
   window.addEventListener('beforeunload', function (e) { if (opened.some(function (o) { return o.dirty; })) e.preventDefault(); });
@@ -175,7 +175,7 @@
         return;
       } catch (e) {}
     }
-    var v = window.open('mini.html', 'kaltoe-mini', 'popup,width=340,height=680');
+    var v = window.open(new URL('mini.html', location.href.split('#')[0]).href, 'kaltoe-mini', 'popup,width=340,height=680');
     if (!v) alert('작은 창이 막혔어요. 주소창 옆의 팝업 차단을 풀고 다시 눌러 주세요.');
   }
   $('popBtn').addEventListener('click', pop);
