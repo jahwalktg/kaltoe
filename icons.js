@@ -53,5 +53,27 @@
     s.innerHTML = '<svg viewBox="0 0 52 52" fill="none" stroke="#1d2b2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (IC[id] || IC._all) + '</svg>';
     return s;
   };
+  /* 하소연하는 칼퇴상사 사람들 (96×96) — 묶음마다 한 사람 */
+  var SKIN = '#ffdcb5', head = '<circle cx="48" cy="42" r="23" fill="' + SKIN + '"/>';
+  function body(c) { return '<path d="M12 96c2-21 16-29 36-29s34 8 36 29z" fill="' + c + '"/>'; }
+  var WHO = {
+    // 눈이 빙글빙글, 머리 쥐어뜯기
+    xl: body('#0f6b66') + head + '<path d="M25 40c-1-17 10-25 23-25s24 8 23 25c-4-7-9-10-14-11l-3-6-5 6c-11 0-19 3-24 11z" fill="#1d2b2d"/><path d="M30 18l-7-8M48 14V4M66 18l7-8" stroke-width="3"/><path d="M34 43c0-6 10-6 10 0 0 5-7 5-7 1 0-2 3-2 3 0M54 43c0-6 10-6 10 0 0 5-7 5-7 1 0-2 3-2 3 0"/><path d="M40 57c3-4 5 2 8-1s5 2 8-1"/><path d="M16 84c-4-16 0-34 9-42M80 84c4-16 0-34-9-42" stroke="#1d2b2d" stroke-width="9"/><path d="M16 84c-4-16 0-34 9-42M80 84c4-16 0-34-9-42" stroke="' + SKIN + '" stroke-width="5"/>',
+    // 눈물, 단발
+    doc: '<path d="M22 66c-5-30 2-54 26-54s31 24 26 54z" fill="#7a4a2b"/>' + body('#cfe3f5') + head + '<path d="M26 38c4-9 10-14 16-15 6 8 18 11 28 12-2-13-10-19-22-19S27 24 26 38z" fill="#7a4a2b"/><path d="M33 41l8 3M63 41l-8 3" stroke-width="3"/><path d="M36 47c-5 7-5 11-1 11s4-5 1-11zM60 47c5 7 5 11 1 11s-4-5-1-11z" fill="#8cc9ef"/><path d="M42 59c3-4 9-4 12 0"/>',
+    // 무거운 상자에 깔림, 땀
+    pic: body('#ffb454') + head + '<path d="M26 38c0-12 8-19 22-19s22 7 22 19c-12-6-32-6-44 0z" fill="#4b3a2f"/><rect x="18" y="2" width="60" height="22" rx="3" fill="#fff3d6"/><path d="M18 11h60M42 2v9h12V2"/><path d="M34 46l7-4-7-3M62 46l-7-4 7-3" stroke-width="2.5"/><path d="M41 56h14M45 53v6M51 53v6"/><path d="M77 34c-4 6-4 9 0 9s4-3 0-9z" fill="#8cc9ef"/>',
+    // 놀란 얼굴, 올림머리
+    ev: '<circle cx="48" cy="11" r="9" fill="#1d2b2d"/>' + body('#c2491d') + head + '<path d="M25 41c0-16 9-24 23-24s23 8 23 24c-5-5-8-9-9-14-9 4-21 4-28 1-1 5-4 9-9 13z" fill="#1d2b2d"/><circle cx="39" cy="43" r="5" fill="#fff"/><circle cx="57" cy="43" r="5" fill="#fff"/><circle cx="39" cy="43" r="1.6" fill="#1d2b2d"/><circle cx="57" cy="43" r="1.6" fill="#1d2b2d"/><ellipse cx="48" cy="57" rx="5" ry="6" fill="#7a1f12"/><path d="M14 22l6 4M12 34h7M82 22l-6 4M84 34h-7" stroke="#c2491d" stroke-width="3"/>',
+    // 졸려서 눈 풀림, 안경
+    day: body('#e3f0ee') + head + '<path d="M25 37c2-15 11-21 24-21s21 7 22 20c-8-2-14-6-17-10-6 6-18 9-29 11z" fill="#6b6f72"/><rect x="30" y="38" width="15" height="12" rx="5" fill="#fff"/><rect x="51" y="38" width="15" height="12" rx="5" fill="#fff"/><path d="M45 43h6M32 44h11M53 44h11"/><path d="M42 58c4 3 8 3 12 0"/><path d="M74 12h9l-9 10h9M84 2h6l-6 7h6" stroke-width="2.5"/><path d="M42 69l6 8 6-8" fill="#fff"/><path d="M48 77l-4 14h8z" fill="#c2491d"/>',
+    // 의자에 기대 부탁하는 미소, 로봇
+    ai: body('#ffcf5a') + head + '<path d="M25 44c-3-20 9-29 24-29 14 0 24 10 22 28-3-8-7-12-12-14-10 3-27 1-34 15z" fill="#a5562b"/><path d="M34 43c2-3 6-3 8 0M54 43c2-3 6-3 8 0" stroke-width="3"/><path d="M40 53c4 6 12 6 16 0" fill="#fff"/><circle cx="33" cy="51" r="3" fill="#f2a08a" stroke="none"/><circle cx="63" cy="51" r="3" fill="#f2a08a" stroke="none"/><rect x="66" y="66" width="26" height="22" rx="5" fill="#0f6b66"/><circle cx="74" cy="76" r="2.5" fill="#fff" stroke="none"/><circle cx="84" cy="76" r="2.5" fill="#fff" stroke="none"/><path d="M79 66v-7M75 83h8" /><circle cx="79" cy="57" r="2.5" fill="#ffb454"/>'
+  };
+  window.KT_WHO = function (id) {
+    var s = document.createElement('span'); s.className = 'who'; s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = '<svg viewBox="0 0 96 96" fill="none" stroke="#1d2b2d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' + (WHO[id] || '') + '</svg>';
+    return s;
+  };
   window.KT_ICON_HAS = function (id) { return !!IC[id]; };
 })();

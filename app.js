@@ -6,6 +6,12 @@
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   $('fb').href = 'https://docs.google.com/forms/d/e/1FAIpQLSeLbEHToGS4f1OqD_MUcwBTR7lm_tWQ6YiQonG1BaHVspLeZQ/viewform?usp=pp_url&entry.743554503=' + encodeURIComponent('칼퇴용 뚝딱 사무도구');
 
+  /* 묶음 머리: 하소연하는 사람 + 말풍선 + 묶음 이름·도구 수·짧은 설명 */
+  function groupHead(tag, c, n) {
+    var d = el('div', 'gh'), h = el(tag, 'gn', c.name), x = el('div', 'gx');
+    h.append(el('small', '', '도구 ' + n + '개')); x.append(h, el('p', '', c.s));
+    var b = el('p', 'bub', c.cry); d.append(window.KT_WHO(c.id), b, x); return d;
+  }
   function star(t, fav) {
     var on = fav.indexOf(t.id) >= 0, s = el('button', 'star', on ? '★' : '☆');
     s.type = 'button'; s.setAttribute('aria-pressed', String(on)); s.setAttribute('aria-label', t.t + ' 즐겨찾기'); s.title = '즐겨찾기(작은 창에도 나와요)';
@@ -29,7 +35,7 @@
       if (allCat && allCat !== c.id) return;
       var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + t.w + (t.k || '') + c.name + c.cry).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
       if (!ts.length) return; n += ts.length;
-      var s = el('section', 'ag'), h = el('h2', '', c.name), ul = el('ul'); h.append(el('small', '', c.cry)); s.append(h, ul);
+      var s = el('section', 'ag'), ul = el('ul'); s.append(groupHead('h2', c, ts.length), ul);
       ts.forEach(function (t) {
         var li = el('li'), a = el('a'), st = star(t, fav), w = el('p', 'aw'), nm = el('div', 'an'); a.href = '#' + t.id; st.setAttribute('data-k', 's' + t.id);
         nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(window.KT_ICON(t.id), nm, w); li.append(a, st); ul.append(li);
@@ -66,8 +72,8 @@
 
   /* 첫 화면 */
   CATS.forEach(function (c) {
-    var s = el('section', 'cat'), h = el('h3', '', c.cry), ul = el('ul', 'cards');
-    h.append(el('small', '', c.name)); s.append(h, ul);
+    var s = el('section', 'cat'), ul = el('ul', 'cards');
+    s.append(groupHead('h3', c, c.tools.length), ul);
     c.tools.forEach(function (t) { var li = el('li'), a = el('a', 'card'), x = el('span'); a.href = '#' + t.id; x.append(el('b', '', t.t), el('span', 'dd1', t.d)); a.append(window.KT_ICON(t.id), x); li.append(a); ul.append(li); });
     $('cats').append(s);
   });
@@ -157,7 +163,7 @@
         var w = await window.documentPictureInPicture.requestWindow({ width: 330, height: 640 });
         pip = w; var dd = w.document; dd.documentElement.lang = 'ko'; dd.title = '칼퇴 작은 창';
         var th = document.documentElement.getAttribute('data-theme'); if (th) dd.documentElement.setAttribute('data-theme', th);
-        ['app.css?v=3', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
+        ['app.css?v=4', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
         dd.body.className = 'mini-win'; var box = dd.createElement('div'); dd.body.append(box);
         var off = M.mount(box, { open: function (id) { window.focus(); window.KT_OPEN(id); } });
         setAway(true); w.addEventListener('pagehide', function () { off(); pip = null; setAway(false); });
