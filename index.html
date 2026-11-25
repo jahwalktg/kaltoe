@@ -15,28 +15,28 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#FFF6E8">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="app.css?v=2">
-<link rel="stylesheet" href="mini.css?v=1">
+<link rel="stylesheet" href="app.css?v=3">
+<link rel="stylesheet" href="mini.css?v=2">
 <script>try{var t=localStorage.getItem('kaltoe.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body>
 <header class="bar">
   <button class="menu" id="menuBtn" type="button" aria-label="도구 목록 열기" aria-expanded="false" aria-controls="side">☰</button>
-  <a class="logo" href="#" id="homeLink"><img src="img/gyun.webp" alt="" width="34" height="34"><span><b>칼퇴용</b> 뚝딱 사무도구</span></a>
+  <a class="logo" href="#" id="homeLink">칼퇴용 뚝딱 사무도구</a>
   <span class="chip" id="chip"></span>
   <span class="sp"></span>
-  <button class="act" id="popBtn" type="button"><span aria-hidden="true">📌</span> <span class="lg">작은 창 띄우기</span></button>
-  <button class="act ic" id="dockBtn" type="button" aria-pressed="true" title="오른쪽 시계·달력·메모 보이기/숨기기" aria-label="오른쪽 시계·달력·메모 보이기/숨기기">🗓️</button>
-  <button class="act ic" id="themeBtn" type="button" title="밝게/어둡게" aria-label="밝게/어둡게">🌗</button>
+  <button class="act" id="popBtn" type="button"><span class="pic" data-ic="_pin"></span><span class="lg">작은 창 띄우기</span></button>
+  <button class="act ic" id="dockBtn" type="button" aria-pressed="true" title="오른쪽 시계·달력·메모 보이기/숨기기" aria-label="오른쪽 시계·달력·메모 보이기/숨기기"><span class="pic" data-ic="_cal"></span></button>
+  <button class="act ic" id="themeBtn" type="button" title="밝게/어둡게" aria-label="밝게/어둡게"><span class="pic" data-ic="_moon"></span></button>
 </header>
 <div class="lay">
   <nav class="side" id="side" aria-label="도구 목록">
     <div class="find"><input id="q" type="search" placeholder="도구 찾기 (예: 합치기, 연차)" aria-label="도구 찾기" autocomplete="off"></div>
-    <a class="allbtn" id="allLink" href="#all"><span aria-hidden="true">🗂️</span> 전체 보기 <b class="cnt"></b></a>
+    <a class="allbtn" id="allLink" href="#all">전체 보기 <b class="cnt"></b></a>
     <div id="list"></div>
   </nav>
   <main class="main" id="main">
@@ -45,10 +45,11 @@
         <div class="ball" id="sun" aria-hidden="true"></div>
         <div class="hill" aria-hidden="true"></div>
         <div class="skytx"><p class="k" id="skyK"></p><h1 id="skyH"></h1><p class="s" id="skyS"></p></div>
-        <img class="gyun" src="img/gyun.webp" alt="" width="132" height="132">
+        <img class="gyun" src="img/gyun.webp" alt="" width="112" height="112">
       </div>
+      <div class="askrow"><h2 class="ask">지금 무슨 일로 퇴근이 늦어지나요?</h2><a class="act alla" href="#all"><span class="pic" data-ic="_all"></span><span>도구 <span class="cnt"></span>개 전체 보기</span></a></div>
+      <p class="lead">하소연을 고르면 도구가 열려요. 설치도 로그인도 없어요.</p>
       <div class="recent" id="recent" hidden></div>
-      <div class="askrow"><h2 class="ask">지금 무슨 일로 퇴근이 늦어지나요?</h2><a class="act alla" href="#all">🗂️ 도구 <span class="cnt"></span>개 전체 보기</a></div>
       <div class="cats" id="cats"></div>
       <section class="rule">
         <h2>쓰기 전에</h2>
@@ -58,7 +59,14 @@
           <li><b>회사에서 막힐 수 있어요.</b> 우편번호 찾기와 사진 손질방의 AI 배경 지우기는 바깥에서 자료를 받아 와요. 나머지는 이 사이트 안에서 돌아가요.</li>
           <li><b>내 스타일로 바꿔 쓰세요.</b> 줄인 시간은 동료와 나에게 돌려주세요.</li>
         </ul>
-        <p class="by">만든 사람 김태균 · <a id="fb" target="_blank" rel="noopener">의견 보내기</a> · 본보기에 나오는 「칼퇴상사」와 사람은 모두 지어낸 것이에요.</p>
+        <p class="lead" style="font-size:.88rem">본보기에 나오는 「칼퇴상사」와 사람은 모두 지어낸 것이에요.</p>
+      </section>
+      <section class="maker" aria-labelledby="makerTitle">
+        <img src="img/maker.webp" alt="만든 사람 김태균 캐릭터" width="96" height="96" loading="lazy">
+        <div><h2 id="makerTitle">만든 사람 · 김태균</h2>
+        <p class="role">서울강남지역자활센터 · 자활전문강사</p>
+        <p>부산서구지역자활센터를 거쳐 지금은 서울강남지역자활센터에서 일하고 있어요. 현장에서 쓰려고 하나씩 만든 도구 가운데, 엑셀·한글·PPT를 쓰는 누구에게나 쓸모 있는 것을 한자리에 모았어요. 귀찮은 일은 뚝딱 끝내고, 줄인 시간은 동료와 나에게 돌려주세요. 만든 결과물은 자유롭게 쓰셔도 돼요.</p>
+        <p><a id="fb" target="_blank" rel="noopener">의견 보내기</a></p></div>
       </section>
     </section>
     <section class="all" id="all" hidden aria-labelledby="allH">
@@ -76,8 +84,9 @@
   <aside class="dock" id="dock" aria-label="시계·달력·메모"><div id="dockMini"></div><p class="away" id="away" hidden>작은 창에 띄워 두었어요.<br><button class="act" type="button" id="backBtn">다시 여기에 두기</button></p></aside>
 </div>
 <div class="stamp" id="stamp" role="status" aria-live="polite"></div>
-<script src="tools.js?v=3"></script>
-<script src="mini.js?v=1"></script>
-<script src="app.js?v=3"></script>
+<script src="tools.js?v=4"></script>
+<script src="icons.js?v=1"></script>
+<script src="mini.js?v=2"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

@@ -14,23 +14,25 @@
   }
   document.querySelectorAll('.cnt').forEach(function (e) { e.textContent = Object.keys(ALL).length; });
 
+  document.querySelectorAll('[data-ic]').forEach(function (e) { e.replaceWith(window.KT_ICON(e.getAttribute('data-ic'))); });
+
   /* 전체 보기 */
   var allCat = '';
   function drawAllView() {
     var q = $('allQ').value.trim().toLowerCase().replace(/\s+/g, ''), fav = M.get('fav', []), box = $('allBody'), chips = $('allChips'), n = 0, act = document.activeElement, keep = act && act.getAttribute('data-k');
     chips.textContent = ''; box.textContent = '';
-    [{ id: '', name: '모두', icon: '🗂️', c: 'var(--ink)' }].concat(CATS).forEach(function (c) {
-      var b = el('button', 'chp' + (allCat === c.id ? ' on' : ''), c.icon + ' ' + c.name + (c.tools ? ' ' + c.tools.length : '')); b.type = 'button'; b.style.setProperty('--c', c.c); b.setAttribute('aria-pressed', String(allCat === c.id)); b.setAttribute('data-k', 'c' + c.id);
+    [{ id: '', name: '모두' }].concat(CATS).forEach(function (c) {
+      var b = el('button', 'chp' + (allCat === c.id ? ' on' : ''), c.name + (c.tools ? ' ' + c.tools.length : '')); b.type = 'button'; b.setAttribute('aria-pressed', String(allCat === c.id)); b.setAttribute('data-k', 'c' + c.id);
       b.addEventListener('click', function () { allCat = c.id; drawAllView(); }); chips.append(b);
     });
     CATS.forEach(function (c) {
       if (allCat && allCat !== c.id) return;
       var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + t.w + (t.k || '') + c.name + c.cry).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
       if (!ts.length) return; n += ts.length;
-      var s = el('section', 'ag'), h = el('h2', '', c.icon + ' ' + c.name + ' '), ul = el('ul'); s.style.setProperty('--c', c.c); h.append(el('small', '', '「' + c.cry + '」')); s.append(h, ul);
+      var s = el('section', 'ag'), h = el('h2', '', c.name), ul = el('ul'); h.append(el('small', '', c.cry)); s.append(h, ul);
       ts.forEach(function (t) {
         var li = el('li'), a = el('a'), st = star(t, fav), w = el('p', 'aw'), nm = el('div', 'an'); a.href = '#' + t.id; st.setAttribute('data-k', 's' + t.id);
-        nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(nm, w); li.append(a, st); ul.append(li);
+        nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(window.KT_ICON(t.id), nm, w); li.append(a, st); ul.append(li);
       });
       box.append(s);
     });
@@ -47,8 +49,8 @@
       var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + t.w + (t.k || '') + c.name).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
       if (!ts.length) return; n += ts.length;
       var on = !!q || openGrp.indexOf(c.id) >= 0 || (cur && ALL[cur].c === c), g = el('div', 'grp' + (on ? ' on' : '')), b = el('button'), ul = el('ul');
-      g.style.setProperty('--c', c.c); b.type = 'button'; b.setAttribute('aria-expanded', String(on));
-      var ic = el('span', '', c.icon); ic.setAttribute('aria-hidden', 'true'); b.append(ic, el('span', '', c.name), el('i', '', '›'));
+      b.type = 'button'; b.setAttribute('aria-expanded', String(on));
+      b.append(el('span', '', c.name), el('i', '', '›'));
       b.addEventListener('click', function () { var i = openGrp.indexOf(c.id), now = g.classList.toggle('on'); if (now && i < 0) openGrp.push(c.id); if (!now && i >= 0) openGrp.splice(i, 1); b.setAttribute('aria-expanded', String(now)); try { localStorage.setItem('kaltoe.grp', JSON.stringify(openGrp)); } catch (e) {} });
       ts.forEach(function (t) {
         var li = el('li', t.id === cur ? 'cur' : ''), a = el('a', '', t.t), s = star(t, fav);
@@ -64,16 +66,16 @@
 
   /* 첫 화면 */
   CATS.forEach(function (c) {
-    var s = el('section', 'cat'), h = el('h3', '', '「' + c.cry + '」'), ul = el('ul'); s.style.setProperty('--c', c.c);
-    h.append(el('small', '', c.icon + ' ' + c.name)); s.append(h, ul);
-    c.tools.forEach(function (t) { var li = el('li'), a = el('a'); a.href = '#' + t.id; a.append(el('b', '', t.t), el('span', '', t.d)); li.append(a); ul.append(li); });
+    var s = el('section', 'cat'), h = el('h3', '', c.cry), ul = el('ul', 'cards');
+    h.append(el('small', '', c.name)); s.append(h, ul);
+    c.tools.forEach(function (t) { var li = el('li'), a = el('a', 'card'), x = el('span'); a.href = '#' + t.id; x.append(el('b', '', t.t), el('span', 'dd1', t.d)); a.append(window.KT_ICON(t.id), x); li.append(a); ul.append(li); });
     $('cats').append(s);
   });
   function saved() { var s = M.get('saved', {}), k = M.ymd(new Date()); return s.d === k ? s : { d: k, n: 0, m: 0 }; }
   function hm(m) { return m >= 60 ? Math.floor(m / 60) + '시간' + (m % 60 ? ' ' + m % 60 + '분' : '') : m + '분'; }
   function drawRecent() {
     var r = M.get('recent', []).filter(function (i) { return ALL[i]; }), b = $('recent'); b.textContent = ''; b.hidden = !r.length; if (!r.length) return;
-    b.append('요즘 연 도구'); r.slice(0, 6).forEach(function (i) { var a = el('a', 'pill', ALL[i].t.t); a.href = '#' + i; a.style.setProperty('--c', ALL[i].c.c); b.append(a); });
+    b.append('요즘 연 도구'); r.slice(0, 6).forEach(function (i) { var a = el('a', 'pill', ALL[i].t.t); a.href = '#' + i; b.append(a); });
   }
   function drawSky() {
     var d = M.day(), w = d.st === 'work' || d.st === 'soon', s = saved();
@@ -111,7 +113,7 @@
   function drawTabs() {
     var b = $('tabs'); b.textContent = '';
     opened.forEach(function (o) {
-      var d = el('div', 'tab' + (o.id === cur ? ' on' : '')), t = el('button', '', ALL[o.id].t.t), x = el('button', 'x', '×'); d.style.setProperty('--c', ALL[o.id].c.c);
+      var d = el('div', 'tab' + (o.id === cur ? ' on' : '')), t = el('button', '', ALL[o.id].t.t), x = el('button', 'x', '×');
       t.type = x.type = 'button'; t.setAttribute('role', 'tab'); t.setAttribute('aria-selected', String(o.id === cur)); x.setAttribute('aria-label', ALL[o.id].t.t + ' 닫기');
       t.addEventListener('click', function () { location.hash = o.id; });
       x.addEventListener('click', function () {
@@ -155,7 +157,7 @@
         var w = await window.documentPictureInPicture.requestWindow({ width: 330, height: 640 });
         pip = w; var dd = w.document; dd.documentElement.lang = 'ko'; dd.title = '칼퇴 작은 창';
         var th = document.documentElement.getAttribute('data-theme'); if (th) dd.documentElement.setAttribute('data-theme', th);
-        ['app.css?v=2', 'mini.css?v=1'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
+        ['app.css?v=3', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
         dd.body.className = 'mini-win'; var box = dd.createElement('div'); dd.body.append(box);
         var off = M.mount(box, { open: function (id) { window.focus(); window.KT_OPEN(id); } });
         setAway(true); w.addEventListener('pagehide', function () { off(); pip = null; setAway(false); });

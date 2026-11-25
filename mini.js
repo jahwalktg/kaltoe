@@ -116,7 +116,7 @@
       (window.KT_CATS || []).forEach(function (c) { c.tools.forEach(function (t) { all[t.id] = { t: t, c: c }; }); });
       ids = ids.filter(function (i) { return all[i]; });
       if (!ids.length) { fav.append(el('p', 'none', '도구의 ☆를 누르면 여기에 모여요')); return; }
-      ids.slice(0, 8).forEach(function (i) { var b = btn('mi-tool', all[i].t.t, '', function () { if (opt.open) opt.open(i); }); b.style.setProperty('--c', all[i].c.c); fav.append(b); });
+      ids.slice(0, 8).forEach(function (i) { var b = btn('mi-tool', all[i].t.t, '', function () { if (opt.open) opt.open(i); }); fav.append(b); });
     }
 
     function tick() {
