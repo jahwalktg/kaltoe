@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>즉석 모션그래픽 — 로고·글자만 바꿔 바로 GIF·MP4로</title>
+<link rel="icon" type="image/png" href="favicon.png">
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&display=swap">
+<style>
+:root{--blue:#1A6EFF;--navy:#1A2B50;--bg:#F4F7FC;--surface:#fff;--line:#D5DDEC;--soft:#EEF3FB;--text:#1A2B50;--muted:#5B6885;--amber-bg:#FFF4D6;--amber:#8A5A00;--amber-line:#E5B93C;--font:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blue:#6BA1FF;--navy:#9DB8F0;--bg:#0E1630;--surface:#17224A;--line:#2F3F73;--soft:#1C2D5E;--text:#EAF0FF;--muted:#A9B6DA;--amber-bg:#3A2F10;--amber:#FFD166;--amber-line:#8F7420}}
+:root[data-theme="dark"]{--blue:#6BA1FF;--navy:#9DB8F0;--bg:#0E1630;--surface:#17224A;--line:#2F3F73;--soft:#1C2D5E;--text:#EAF0FF;--muted:#A9B6DA;--amber-bg:#3A2F10;--amber:#FFD166;--amber-line:#8F7420}
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}
+body.noscroll{overflow:hidden}
+a{color:var(--blue)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:1440px;margin:0 auto;padding:16px}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:8px}
+h1{margin:0;font-size:1.35rem}
+.sub{margin:0;color:var(--muted);font-size:.9rem}
+.notice{background:var(--amber-bg);color:var(--amber);border:1.5px solid var(--amber-line);border-radius:12px;padding:10px 14px;font-size:.9rem;margin:8px 0 14px}
+.notice b{font-weight:800}
+.layout{display:grid;grid-template-columns:260px minmax(280px,380px) 1fr;gap:16px;align-items:start}
+@media (max-width:1100px){.layout{grid-template-columns:240px 1fr}.col3{grid-column:1/-1}}
+@media (max-width:900px){.layout{grid-template-columns:1fr}.col3{grid-column:auto}}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:14px;min-width:0}
+.layout>*{min-width:0}
+.card h2{margin:0 0 8px;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+#gal{position:fixed;inset:0;background:rgba(10,16,40,.72);backdrop-filter:blur(4px);z-index:400;display:none;overflow:auto;padding:16px}
+#gal.on{display:block}
+.galIn{max-width:1500px;margin:0 auto;background:var(--bg);border:1.5px solid var(--line);border-radius:18px;padding:14px 18px 22px;min-height:60vh}
+.galHead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.galHead b{font-size:1.1rem;flex:1 1 240px}
+.galHead label.btn{cursor:pointer}
+.galHead #galQ{flex:1 1 260px;max-width:420px;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:inherit}
+.gsec{margin:14px 0 6px}
+.gsec h3{margin:0 0 10px;font-size:1.05rem;padding-left:10px;border-left:5px solid var(--blue)}
+.gsec h3 small{color:var(--muted);font-weight:500;font-size:.82rem;margin-left:6px}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.gc{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .12s,border-color .12s}
+.gc:hover,.gc.live{border-color:var(--blue);transform:translateY(-2px)}
+.gth{position:relative;aspect-ratio:16/9;background:#111}
+.gth canvas{width:100%;height:100%;display:block}
+.gth .gtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:8px}
+.gth .gtag+.gtag{left:auto;right:8px}
+.gth .gnum{position:absolute;left:8px;top:8px;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center}
+.gth .ghint{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:.72rem;padding:2px 8px;border-radius:8px;opacity:.9}
+.gc.live .ghint{display:none}
+.gb{padding:10px 12px 4px;flex:1}
+.gb b{display:block;font-size:.98rem;margin-bottom:4px}
+.gb p{margin:0;font-size:.82rem;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gb small{display:block;margin-top:6px;color:var(--blue);font-size:.74rem}
+.gb .gw{display:block;font-size:.8rem;color:var(--amber);background:var(--amber-bg);border-radius:8px;padding:2px 8px;margin:2px 0 6px;font-weight:600}
+.sc em.when{color:var(--amber);font-weight:500}
+p.when{margin:0 0 6px;font-size:.84rem;color:var(--amber);background:var(--amber-bg);border-radius:8px;padding:4px 10px;font-weight:600}
+.gops{display:flex;gap:6px;padding:8px 12px 12px}
+.gops .btn{min-height:34px;font-size:.84rem;padding:4px 10px}
+@media (max-width:700px){.ggrid{grid-template-columns:repeat(2,1fr)}.gb p{-webkit-line-clamp:2}.gops .btn{font-size:.78rem}}
+.step{display:inline-flex;flex:none;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:900;font-size:1.2rem;align-items:center;justify-content:center;line-height:1}
+.guide{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin:8px 0 14px}
+.scName{margin:4px 0 4px;font-size:1.02rem}
+.guide .gt{font-weight:800;font-size:1rem;margin-bottom:10px}
+.gsteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}
+.gsteps li{display:flex;gap:9px;align-items:flex-start}
+.gsteps li b{display:block;font-size:.95rem}
+.gsteps li small{display:block;color:var(--muted);font-size:.8rem;line-height:1.4;margin-top:2px}
+.guide .gn{margin-top:10px;font-size:.84rem;color:var(--amber);background:var(--amber-bg);border-radius:10px;padding:7px 10px}
+.card h3{margin:14px 0 6px;font-size:.95rem;color:var(--muted)}
+.grp{font-size:.78rem;color:var(--muted);margin:10px 4px 4px;font-weight:700}
+.sc{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:1.5px solid transparent;background:transparent;border-radius:12px;padding:8px 10px;margin:2px 0}
+.sc:hover{background:var(--soft)}
+.sc.on{border-color:var(--blue);background:var(--soft)}
+.sc .ic{font-size:1.3rem;flex:none}
+.sc .nm{font-size:.92rem;font-weight:600;line-height:1.3}
+.sc em{display:block;font-style:normal;font-size:.75rem;color:var(--muted);font-weight:500}
+.desc{margin:0 0 10px;color:var(--muted);font-size:.88rem}
+.fld{display:block;margin:10px 0}
+.fld>span{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px}
+.fld input[type=text],.fld input[type=number],.fld textarea,.fld select,.g input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--bg)}
+.fld textarea{resize:vertical;min-height:70px}
+.hint{display:block;color:var(--muted);font-size:.78rem;margin-top:4px}
+.g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 12px;align-items:center;font-size:.88rem}
+.g>label{min-width:0}
+.g select,.g input,.g button{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.g select{text-overflow:ellipsis}
+.g label{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.82rem}
+.g select{border:1.5px solid var(--line);border-radius:10px;padding:7px 9px;background:var(--bg)}
+.g input[type=color]{width:100%;height:38px;border:1.5px solid var(--line);border-radius:10px;padding:2px;background:var(--bg)}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.preset{width:34px;height:26px;border-radius:8px;border:1.5px solid var(--line);padding:0;overflow:hidden;display:flex}
+.preset i{flex:1;display:block}
+#prevBox{background:#000;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:linear-gradient(45deg,#2a2a2a 25%,transparent 25%),linear-gradient(-45deg,#2a2a2a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#2a2a2a 75%),linear-gradient(-45deg,transparent 75%,#2a2a2a 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;background-color:#1a1a1a}
+#prev{display:block}
+.ctrl{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.ctrl input[type=range]{flex:1;min-width:120px}
+.ctrl .t{font-size:.85rem;color:var(--muted);white-space:nowrap}
+.btn{min-height:42px;padding:6px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:.95rem;line-height:1.25;white-space:normal;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;max-width:100%;color:inherit;font-family:inherit;cursor:pointer}
+.btn.ico{flex-direction:row}
+.btn.main{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.ico{width:44px;padding:0;font-size:1.1rem}
+.btn:disabled{opacity:.5;cursor:default}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.dl .btn{width:100%}
+.dl small{display:block;font-weight:500;font-size:.75rem;opacity:.85}
+.opt{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:.82rem;color:var(--muted);align-items:center}
+.opt select{border:1.5px solid var(--line);border-radius:8px;padding:4px 6px;background:var(--bg);font-size:.82rem}
+.dim .dl{opacity:.45}
+.how{font-size:.88rem}
+.how ol{margin:6px 0 0;padding-left:20px}
+.how li{margin:3px 0}
+#live{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:50}
+#live.on{display:flex}
+#liveExit{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:10px;padding:8px 14px;opacity:.6}
+#liveExit:hover{opacity:1}
+#liveHelp{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:#fff;opacity:.45;font-size:.85rem;white-space:nowrap}
+#prog{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:60}
+#prog.on{display:flex}
+#prog .box{background:var(--surface);border-radius:16px;padding:22px;width:min(420px,90vw)}
+#progBarWrap{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:12px 0}
+#progBar{height:100%;background:var(--blue);width:0;transition:width .15s}
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:#1A2B50;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;z-index:70;max-width:90vw;font-size:.9rem}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#q{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);margin-bottom:8px}
+.gtabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.gt{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.gt.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.sc{position:relative;cursor:pointer}
+.sc .th{width:72px;height:40.5px;border-radius:6px;flex:none;background:#222}
+.sc .fav{position:absolute;right:6px;top:6px;border:0;background:transparent;color:var(--line);font-size:1rem;padding:2px 4px;line-height:1}
+.sc .fav.on{color:#F2B705}
+.sc .nm{padding-right:22px}
+#liveHelp.wait{opacity:1;color:#FFD166;font-weight:700}
+.sits{padding-bottom:6px;border-bottom:1px dashed var(--line)}
+.gt.sit.on{background:var(--amber-line);border-color:var(--amber-line);color:#1A2B50}
+.sitHead{font-size:.82rem;color:var(--muted);background:var(--amber-bg);color:var(--amber);border-radius:10px;padding:8px 10px;margin:6px 0}
+.sc .num{flex:none;width:22px;font-weight:800;color:var(--blue);font-size:1rem}
+.more{margin-top:8px}
+.more summary{cursor:pointer;color:var(--muted);font-size:.85rem;padding:6px 4px}
+.sc .addc{flex:none;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);background:transparent;color:var(--blue);font-weight:900;font-size:1.05rem;cursor:pointer;margin-left:2px}
+.sc .addc:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.badge{display:inline-block;min-width:22px;padding:0 7px;border-radius:11px;background:var(--blue);color:#fff;font-size:.78rem;line-height:22px;text-align:center;vertical-align:middle;margin-left:4px}
+.ci{display:flex;align-items:center;gap:6px;padding:6px 6px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:6px;background:var(--card2,transparent)}
+.ci.on{border-color:var(--blue)}
+.ci .n{flex:none;width:22px;font-weight:800;color:var(--blue)}
+.ci .nm{flex:1;min-width:0;text-align:left;background:transparent;border:0;color:inherit;font:inherit;font-weight:700;cursor:pointer;padding:2px 0;line-height:1.3}
+.ci .nm em{font-style:normal;font-weight:500;color:var(--muted)}
+.ci .nm small{display:block;color:var(--muted);font-weight:500;font-size:.75rem}
+.ci .ops{flex:none;display:flex;gap:3px}
+.ci .ops button{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:transparent;color:inherit;cursor:pointer}
+.ci .ops button:hover{background:var(--line)}
+footer{margin:24px 0 10px;color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+<link rel="stylesheet" href="../../frame.css">
+<script src="../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>⚡ 즉석 모션그래픽</h1>
+    <p class="sub">로고·글자만 바꿔 바로 GIF·MP4로 — PPT와 행사 화면에 바로 쓰는 움직이는 장면</p>
+  </header>
+  <div class="guide">
+    <div class="gt">이렇게 씁니다 — 행사 화면·PPT에 넣을 움직이는 장면을 글자만 바꿔 1~2분에</div>
+    <ol class="gsteps">
+      <li><span class="step">1</span><div><b>장면 고르기</b><small>왼쪽에서 찾기(「시상」「타이머」「국기」…), 상황 고르기(행사 한 바퀴·수료식·교육…), 묶음 탭으로 70가지 중 하나</small></div></li>
+      <li><span class="step">2</span><div><b>글·디자인 바꾸기</b><small>행사명·이름만 바꾸면 끝. 테마 7종·색·로고는 모든 장면에 같이 적용</small></div></li>
+      <li><span class="step">3</span><div><b>미리보기</b><small>바로 재생해 확인. 행사장에서는 「전체화면으로 재생」 — 스페이스로 멈춤·다음 단계, Esc 나가기</small></div></li>
+      <li><span class="step">4</span><div><b>받기</b><small>MP4(PPT 비디오·소리 포함) / GIF(그림·카카오톡) / PNG 한 장</small></div></li>
+      <li><span class="step">5</span><div><b>PPT 묶음</b><small>여러 장면이 필요하면 카드의 ＋로 담아 순서를 맞추고 PPT 한 파일로</small></div></li>
+      <li><span class="step">6</span><div><b>발표 뼈대</b><small>용도·제목·장 목록만 적으면 표지~마무리 15~25장을 PowerPoint에서 고치는 PPT로</small></div></li>
+    </ol>
+    <div class="gn"><b>설치·로그인 없음.</b> 입력한 글·사진·로고·음원은 이 브라우저 안에서만 쓰고 어디에도 보내지 않습니다. 영상 만들기는 <b>크롬·엣지</b>에서 가장 잘 됩니다.</div>
+  </div>
+
+  <div class="layout">
+    <aside class="card">
+      <h2><span class="step">1</span>장면 고르기</h2>
+      <button type="button" class="btn main" id="galBtn" style="width:100%;margin:0 0 8px"><span style="font-size:1.05rem">🗂 전체 장면 한눈에 보기</span><small>70가지를 큰 그림으로 둘러보기 · 올리면 움직임</small></button>
+      <input type="search" id="q" placeholder="찾기: 시상, 타이머, QR, 국기, 조 편성…" aria-label="장면 찾기">
+      <div id="sits" class="gtabs sits"></div>
+      <div id="gtabs" class="gtabs"></div>
+      <div id="list"></div>
+    </aside>
+
+    <section class="card">
+      <h2><span class="step">2</span>글·디자인 바꾸기</h2>
+      <div id="form"></div>
+      <div id="stepNote" class="hint" hidden style="margin:6px 0 0">이 장면은 단계가 있습니다. 전체화면 재생에서 단계마다 멈추고 <b>스페이스</b>로 넘어갑니다(사회자 속도에 맞춤). 파일로 받을 때는 입력한 초로 자동 진행.</div>
+      <div class="row" style="margin-top:10px"><button type="button" class="btn" id="shareBtn" style="min-height:38px;font-size:.85rem">🔗 이 장면 설정 링크 복사</button></div>
+      <div id="liveOnlyNote" class="notice" hidden>이 장면은 길어서 파일로 받지 않습니다. 오른쪽 <b>「전체화면으로 재생」</b>으로 현장에서 바로 띄우세요.</div>
+      <h3>공통 — 디자인·비율·색·로고</h3>
+      <div class="g">
+        <label style="grid-column:1/-1">디자인 테마<select id="theme"></select><small class="hint" id="themeNote"></small><button type="button" class="btn" id="themeColors" style="min-height:32px;font-size:.78rem;margin-top:4px">이 테마 기본 색으로 되돌리기</button></label>
+        <label>화면 비율<select id="ratio"><option value="16:9">16:9 가로 (PPT·화면)</option><option value="1:1">1:1 정사각 (SNS)</option><option value="9:16">9:16 세로 (스토리·키오스크)</option></select></label>
+        <label>배경<select id="bgMode"><option value="color">색 배경</option><option value="trans">투명 (GIF로 받을 때, 영상·슬라이드 위에 얹기)</option></select></label>
+        <label>주색<input type="color" id="c1"></label>
+        <label>보조색<input type="color" id="c2"></label>
+        <label>배경색<input type="color" id="bg"></label>
+        <label>로고(선택)<input type="file" id="logo" accept="image/*"><small class="hint" id="logoNote"></small><button type="button" class="btn" id="logoDel" hidden style="min-height:34px;font-size:.8rem">로고 빼기</button></label>
+      </div>
+      <div class="presets" title="색 묶음">
+        <button type="button" class="preset" data-c="#1A6EFF,#F28C28,#0E1630" title="파랑·주황 / 짙은 남색"><i style="background:#1A6EFF"></i><i style="background:#F28C28"></i><i style="background:#0E1630"></i></button>
+        <button type="button" class="preset" data-c="#1F9D5C,#F2B705,#0F2A1E" title="초록·노랑 / 짙은 초록"><i style="background:#1F9D5C"></i><i style="background:#F2B705"></i><i style="background:#0F2A1E"></i></button>
+        <button type="button" class="preset" data-c="#8A6BE0,#F28CB1,#1B1230" title="보라·분홍 / 짙은 보라"><i style="background:#8A6BE0"></i><i style="background:#F28CB1"></i><i style="background:#1B1230"></i></button>
+        <button type="button" class="preset" data-c="#E63946,#F2B705,#2B0F12" title="빨강·노랑 / 짙은 빨강"><i style="background:#E63946"></i><i style="background:#F2B705"></i><i style="background:#2B0F12"></i></button>
+        <button type="button" class="preset" data-c="#1A6EFF,#1F9D5C,#FFFFFF" title="파랑·초록 / 흰 바탕"><i style="background:#1A6EFF"></i><i style="background:#1F9D5C"></i><i style="background:#fff"></i></button>
+        <button type="button" class="preset" data-c="#B07200,#1A2B50,#FFF8E6" title="금색·남색 / 크림"><i style="background:#B07200"></i><i style="background:#1A2B50"></i><i style="background:#FFF8E6"></i></button>
+        <button type="button" class="preset" data-c="#0FA3B1,#F28C28,#F4F7FC" title="청록·주황 / 밝은 회색"><i style="background:#0FA3B1"></i><i style="background:#F28C28"></i><i style="background:#F4F7FC"></i></button>
+      </div>
+    </section>
+
+    <section class="card col3">
+      <h2><span class="step">3</span>미리보기</h2>
+      <div id="prevBox"><canvas id="prev"></canvas></div>
+      <div class="ctrl">
+        <button type="button" class="btn ico" id="play" title="재생/멈춤">⏸</button>
+        <button type="button" class="btn ico" id="restart" title="처음부터">↺</button>
+        <input type="range" id="seek" min="0" max="6" step="0.01" value="0">
+        <span class="t"><span id="tLbl">0초</span> / <span id="durLbl">6초</span></span>
+        <button type="button" class="btn main" id="liveBtn">⛶ 전체화면으로 재생</button>
+        <label class="t" style="display:flex;gap:4px;align-items:center"><input type="checkbox" id="stepMode" checked> 단계마다 멈춤(스페이스로 다음)</label>
+        <label class="t" style="display:flex;gap:4px;align-items:center" title="음원이 든 장면(국민의례·애국가)의 소리를 미리보기에서도 들음. 전체화면 재생에서는 항상 들림"><input type="checkbox" id="sndPrev"> 미리보기 소리</label>
+      </div>
+      <h2 style="margin-top:16px"><span class="step">4</span>받기 — 파일 하나</h2>
+      <div id="dlBox">
+        <div class="dl">
+          <button type="button" class="btn main" id="dlMp4">MP4 영상 받기<small>PPT 「삽입 › 비디오」에 바로</small></button>
+          <button type="button" class="btn" id="dlGif">GIF 받기<small>카카오톡·문서·PPT 그림으로</small></button>
+          <button type="button" class="btn" id="dlPng">PNG 한 장 받기<small>지금 멈춘 그림</small></button>
+        </div>
+        <div class="opt">
+          <span>MP4 크기 <select id="vq"><option value="full">원본(1920×1080급)</option><option value="hd">작게(1280×720급)</option></select></span>
+          <span>GIF 가로 <select id="gq"><option value="960">960px</option><option value="640" selected>640px</option><option value="480">480px</option></select></span>
+        </div>
+        <p class="hint" id="mp4Note" hidden>이 브라우저는 MP4를 직접 만들지 못해 WebM으로 받게 됩니다. PPT에 넣으려면 크롬·엣지에서 다시 받아 주세요.</p>
+      </div>
+      <h2 style="margin-top:18px"><span class="step">5</span>PPT 묶음 <span class="badge" id="cartN">0</span></h2>
+      <div id="cartBox">
+        <p class="hint" style="margin:0 0 8px">장면 카드의 <b>＋</b>를 누르면 <b>지금 입력·디자인 그대로</b> 담깁니다. 순서를 맞춘 뒤 받으면 <b>슬라이드마다 장면 하나</b>가 든 PPT 한 파일이 됩니다. 같은 장면을 글자만 바꿔 여러 번 담아도 됩니다(호명 카드 여러 명 등).</p>
+        <div id="cart"></div>
+        <div class="opt" style="margin-top:8px">
+          <span>형식 <select id="bFmt"><option value="mp4">MP4 (고화질·소리 포함, 슬라이드 열리면 자동 실행)</option><option value="gif">GIF (저절로 움직임, 화질 보통, 소리 없음)</option></select></span>
+          <span>크기 <select id="bSize"><option value="full">원본</option><option value="hd">작게(파일 가볍게)</option></select></span>
+          <label class="t" style="display:flex;gap:4px;align-items:center"><input type="checkbox" id="bAdv"> 장면이 끝나면 다음 슬라이드로 자동 넘김</label>
+        </div>
+        <div class="dl" style="margin-top:8px">
+          <button type="button" class="btn main" id="bBuild">PPT 파일로 받기<small>슬라이드마다 장면 하나 · 노트에 설정 링크</small></button>
+          <button type="button" class="btn" id="bClear">묶음 비우기</button>
+        </div>
+        <p class="hint">PowerPoint에서 순서 바꾸기·내 장표 끼우기·삭제는 자유롭지만, <b>장면 안 글자는 PowerPoint에서 못 고칩니다.</b> 고치려면 슬라이드 노트의 <b>설정 링크</b>를 열어 고친 뒤 다시 받아 바꿔 넣으세요.</p>
+      </div>
+      <h2 style="margin-top:20px"><span class="step">6</span>발표 뼈대 만들기 <small style="font-size:.78rem;font-weight:600;color:var(--muted)">PowerPoint에서 바로 고치는 PPT</small></h2>
+      <div id="deckBox">
+        <p class="hint" style="margin:0 0 8px">용도를 고르고 제목·장 목록만 적으면 <b>표지·목차·장 전환·본문·마무리</b>까지 발표 한 편의 뼈대(15~25장)가 PPT로 나옵니다. 모두 PowerPoint <b>글상자·도형·표</b>라 바로 고칠 수 있고, 배경은 지금 고른 <b>디자인 테마</b>가 슬라이드 마스터로 들어가 장을 더해도 같은 모양입니다.</p>
+        <div class="g">
+          <label style="grid-column:1/-1">용도<select id="dPurpose"></select></label>
+          <label style="grid-column:1/-1">발표 제목<input type="text" id="dTitle" maxlength="60"></label>
+          <label style="grid-column:1/-1">부제(선택)<input type="text" id="dSub" maxlength="60"></label>
+          <label>날짜·장소(선택)<input type="text" id="dDate" maxlength="60" placeholder="2026. 12. 12.(금) 14:00 · 대강당"></label>
+          <label>회사 이름<input type="text" id="dOrg" maxlength="30" placeholder="칼퇴상사"></label>
+          <label>발표자(선택)<input type="text" id="dWho" maxlength="30" placeholder="기획팀장 김○○"></label>
+          <label>연락처(선택)<input type="text" id="dTel" maxlength="40" placeholder="02-000-0000"></label>
+          <label style="grid-column:1/-1">마지막 장 QR 주소(선택)<input type="text" id="dUrl" maxlength="300" placeholder="설문·자료 주소"></label>
+        </div>
+        <label class="fld"><span>장 목록 — 한 줄에 「장 제목 | 모양, 모양」 · 모양: 글머리 · 숫자3 · 표 · 사진 · 인용 (모양을 안 적으면 간지 한 장만)</span><textarea id="dChapters" rows="7"></textarea></label>
+        <div class="opt"><label class="t" style="display:inline-flex;gap:4px;align-items:center"><input type="checkbox" id="dToc"> 목차(식순) 장</label><label class="t" style="display:inline-flex;gap:4px;align-items:center"><input type="checkbox" id="dBrk"> 가운데 쉬는 시간 장</label></div>
+        <details style="margin-top:8px"><summary style="cursor:pointer;font-weight:700;font-size:.9rem">장마다 내용 적기 <span class="hint">(비워 두면 회색 「채울 자리」 글이 들어가 PowerPoint에서 채웁니다)</span></summary><div id="dContents"></div></details>
+        <div class="opt" style="margin-top:8px"><span>움직이는 장면 끼우기:</span><span id="dMotions"></span></div>
+        <div class="opt"><label class="t" style="display:inline-flex;gap:4px;align-items:center"><input type="checkbox" id="dStill" checked> 영상 장 뒤에 같은 내용의 정지 장표도 한 장 더(영상이 안 되는 PC 대비)</label></div>
+        <div class="dl" style="margin-top:8px">
+          <button type="button" class="btn main" id="dBuild">발표 뼈대 PPT 받기<small id="dCount"></small></button>
+          <button type="button" class="btn" id="dReset">이 용도 기본으로</button>
+        </div>
+        <p class="hint">PPT는 16:9로 만듭니다. 테마·색·로고는 왼쪽 「② 공통」 칸 그대로 쓰니, 먼저 테마를 고르고 받으세요. 움직이는 장면을 많이 끼울수록 만드는 시간이 조금 늘어납니다(장면당 1~3초).</p>
+      </div>
+      <div class="how" style="margin-top:14px">
+        <b>두 가지로 쓰세요</b>
+        <ol>
+          <li><b>① 급할 때 그 자리에서</b> — 행사 준비·당일에 바로. 장면 하나 골라 글자만 바꾸고 <b>전체화면으로 재생</b>(스페이스 멈춤/다음 단계, R 처음부터, Esc 나가기)하거나 MP4·GIF 한 개만 받아 씁니다. 설치·로그인 없이 인터넷 창만 있으면 됩니다.</li>
+          <li><b>② 디자인이 어려울 때 PPT로</b> — 움직이는 장면만 모으려면 위 ⑤ <b>PPT 묶음</b>, 발표 한 편을 통째로 시작하려면 ⑥ <b>발표 뼈대</b>. ⑤는 필요한 장면만 ＋로 담고 순서를 맞춰 <b>PPT 한 파일</b>로 받습니다(위 ④). 받은 파일에 내 발표 장표를 끼우고 순서를 바꿔 그대로 쓰면 됩니다. 테마·색은 담을 때의 것이 장면마다 따로 들어갑니다.</li>
+          <li><b>MP4를 따로 넣을 때</b>: 슬라이드에서 <b>삽입 › 비디오 › 이 디바이스</b> → 비디오 선택 → <b>재생 탭 › 시작: 자동</b>. <b>GIF</b>는 <b>삽입 › 그림</b>으로 넣으면 슬라이드 쇼에서 저절로 움직입니다. 배경을 「투명」으로 받은 GIF는 자막 띠·공지를 장표 위에 얹을 수 있습니다.</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div>만든 사람: 김태균 · 이 도구는 <b>누구나</b> 쓸 수 있고, 결과물은 자유롭게 쓰셔도 됩니다.</div>
+    <div class="hint" style="margin-top:6px">기본 음원 출처: 「국기에 대한 경례 음원(맹세문 버전·배경음악 버전)」 해군군악대·황병준·김남길(작곡 이교숙), 「2018 애국가(합창) 1절·1~4절」 — 한국저작권위원회 <a href="https://gongu.copyright.or.kr/" target="_blank" rel="noopener">공유마당</a> 기증저작물(자유 이용). 애국가는 2005년 안익태 선생 유족이 국가에 기증한 저작물입니다.</div>
+    <div id="makerLine" data-jt-contact>도구 문의·의견: jahwalktg@gmail.com</div>
+  </footer>
+</div>
+
+<div id="gal" role="dialog" aria-label="전체 장면 한눈에 보기">
+  <div class="galIn">
+    <div class="galHead">
+      <b>🗂 전체 장면 한눈에 보기 <span class="hint" id="galCnt"></span></b>
+      <input type="search" id="galQ" placeholder="찾기: 시상, 타이머, QR, 국기, 조 편성…">
+      <label class="btn" style="min-height:40px;font-size:.86rem" title="사진 한 장을 고르면 사진이 들어가는 장면들에 시험으로 넣어 큰 그림으로 봅니다">🖼 내 사진으로 미리보기<small style="font-weight:500;font-size:.72rem;opacity:.85">사진 장면 8개를 내 사진으로</small><input type="file" id="galPhoto" accept="image/*" hidden></label>
+      <button type="button" class="btn" id="galPhotoDel" hidden style="min-height:38px;font-size:.84rem">사진 빼기</button>
+      <button type="button" class="btn" id="galClose">✕ 닫기 (Esc)</button>
+    </div>
+    <div class="hint" id="galPhotoNote" style="margin:0 0 4px">「내 사진으로 미리보기」: 사진 한 장을 고르면 사진 칸이 비어 있는 장면(켄 번스·슬라이드·콜라주·폴라로이드·전후 비교·스포트라이트·펜 판서)에 시험으로 들어가, 내 사진으로 어떻게 보일지 한꺼번에 볼 수 있습니다. 「사진 빼기」로 되돌리고, 원래 넣어 둔 사진은 건드리지 않습니다.</div>
+    <div class="gtabs" id="galSits"></div>
+    <p class="hint" style="margin:4px 0 8px">카드에 마우스를 올리면 그 자리에서 움직입니다. 「이 장면 쓰기」를 누르면 입력 칸으로, 「＋ 담기」는 PPT 묶음에 넣습니다. 미리보기는 지금 고른 테마·색으로 그립니다.</p>
+    <div id="galBody"></div>
+  </div>
+</div>
+<div id="live"><canvas id="liveCv"></canvas><button type="button" id="liveExit">✕ 나가기 (Esc)</button><div id="liveHelp">스페이스 멈춤/재생 · R 처음부터 · Esc 나가기</div></div>
+<div id="prog"><div class="box"><div id="progTxt">만드는 중…</div><div id="progBarWrap"><div id="progBar"></div></div><button type="button" class="btn" id="progCancel">그만하기</button></div></div>
+<div id="toast"></div>
+
+<script src="../../lib/gif.js"></script>
+<script src="../../lib/mp4-muxer.min.js"></script>
+<script src="../../lib/qrcode.min.js"></script>
+<script src="core.js?v=4"></script>
+<script src="themes.js?v=4"></script>
+<script src="tags.js?v=9"></script>
+<script src="scenes/a_rite.js?v=4"></script>
+<script src="scenes/e_ceremony.js?v=9"></script>
+<script src="scenes/b_run.js?v=4"></script>
+<script src="scenes/f_run2.js?v=4"></script>
+<script src="scenes/c_ppt.js?v=4"></script>
+<script src="scenes/g_ppt2.js?v=9"></script>
+<script src="scenes/d_end.js?v=4"></script>
+<script src="scenes/h_end2.js?v=4"></script>
+<script src="scenes/i_rite3.js?v=4"></script>
+<script src="scenes/j_run3.js?v=4"></script>
+<script src="scenes/k_ppt3.js?v=10"></script>
+<script src="scenes/l_end3.js?v=4"></script>
+<script src="scenes/m_run4.js?v=9"></script>
+<script src="scenes/n_ppt4.js?v=10"></script>
+<script src="scenes/o_promo4.js?v=9"></script>
+<script src="app.js?v=11"></script>
+<script src="bundle.js?v=11"></script>
+<script src="deck.js?v=13"></script>
+<script src="gallery.js?v=9"></script>
+</body>
+</html>

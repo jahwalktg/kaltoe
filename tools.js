@@ -31,6 +31,7 @@ window.KT_CATS = [
     { id: 'show-vote', t: '한 화면 투표', d: '회의 자리에서 바로 세고 결과 복사', p: 'show-vote/index.html', m: 5, k: '표결 거수' },
     { id: 'greeting', t: '인사장·초대장 만들기', d: '명절·행사 인사장을 이름별로', p: 'greeting/index.html', m: 25, k: '카드 연하장 초청' },
     { id: 'newsletter', t: '소식지·카드뉴스', d: '사진과 글만 넣으면 사보 모양으로', p: 'newsletter/index.html', m: 40, k: '사보 뉴스레터 홍보' },
+    { id: 'motion', t: '즉석 모션그래픽', d: '로고·글자만 바꿔 움직이는 장면 70가지를 GIF·MP4로', p: 'motion/index.html', m: 40, k: '영상 움짤 행사 시상 타이머 국민의례 오프닝 파워포인트 발표 뼈대' },
     { id: 'map', t: '약도 그리기', d: '오시는 길 약도와 안내 글', p: 'map/index.html', m: 20, k: '지도 길찾기 위치' },
     { id: 'qr', t: 'QR코드 만들기', d: '주소·연락처 QR과 A4 게시물', p: 'qr/index.html', m: 5, k: '큐알 링크' },
     { id: 'labels', t: '우편 주소 라벨', d: '주소록을 라벨지에 맞춰 인쇄', p: 'labels/index.html', m: 20, k: '봉투 우편번호 발송' } ] },
