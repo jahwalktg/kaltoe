@@ -19,7 +19,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="app.css?v=1">
+<link rel="stylesheet" href="app.css?v=2">
 <link rel="stylesheet" href="mini.css?v=1">
 <script>try{var t=localStorage.getItem('kaltoe.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
@@ -36,6 +36,7 @@
 <div class="lay">
   <nav class="side" id="side" aria-label="도구 목록">
     <div class="find"><input id="q" type="search" placeholder="도구 찾기 (예: 합치기, 연차)" aria-label="도구 찾기" autocomplete="off"></div>
+    <a class="allbtn" id="allLink" href="#all"><span aria-hidden="true">🗂️</span> 전체 보기 <b class="cnt"></b></a>
     <div id="list"></div>
   </nav>
   <main class="main" id="main">
@@ -47,7 +48,7 @@
         <img class="gyun" src="img/gyun.webp" alt="" width="132" height="132">
       </div>
       <div class="recent" id="recent" hidden></div>
-      <h2 class="ask">지금 무슨 일로 퇴근이 늦어지나요?</h2>
+      <div class="askrow"><h2 class="ask">지금 무슨 일로 퇴근이 늦어지나요?</h2><a class="act alla" href="#all">🗂️ 도구 <span class="cnt"></span>개 전체 보기</a></div>
       <div class="cats" id="cats"></div>
       <section class="rule">
         <h2>쓰기 전에</h2>
@@ -60,6 +61,13 @@
         <p class="by">만든 사람 김태균 · <a id="fb" target="_blank" rel="noopener">의견 보내기</a> · 본보기에 나오는 「칼퇴상사」와 사람은 모두 지어낸 것이에요.</p>
       </section>
     </section>
+    <section class="all" id="all" hidden aria-labelledby="allH">
+      <h1 id="allH">전체 보기 <small>도구 <span class="cnt"></span>개</small></h1>
+      <p class="allp">이름 옆의 「이럴 때 쓰면 좋아요」를 훑어보고 고르세요. ☆를 누르면 작은 창에도 나와요.</p>
+      <div class="allbar"><input id="allQ" type="search" placeholder="상황으로 찾기 (예: 반려, 명단, 행사)" aria-label="전체 보기에서 찾기" autocomplete="off"><div class="chips" id="allChips"></div></div>
+      <p class="nores" id="allNone" hidden>맞는 도구가 없어요. 다른 말로 찾아보세요.</p>
+      <div id="allBody"></div>
+    </section>
     <section class="work" id="work" hidden>
       <div class="tabs" id="tabs" role="tablist" aria-label="열어 둔 도구"></div>
       <div class="frames" id="frames"></div>
@@ -68,8 +76,8 @@
   <aside class="dock" id="dock" aria-label="시계·달력·메모"><div id="dockMini"></div><p class="away" id="away" hidden>작은 창에 띄워 두었어요.<br><button class="act" type="button" id="backBtn">다시 여기에 두기</button></p></aside>
 </div>
 <div class="stamp" id="stamp" role="status" aria-live="polite"></div>
-<script src="tools.js?v=2"></script>
+<script src="tools.js?v=3"></script>
 <script src="mini.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

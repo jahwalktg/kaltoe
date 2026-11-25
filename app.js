@@ -6,22 +6,53 @@
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   $('fb').href = 'https://docs.google.com/forms/d/e/1FAIpQLSeLbEHToGS4f1OqD_MUcwBTR7lm_tWQ6YiQonG1BaHVspLeZQ/viewform?usp=pp_url&entry.743554503=' + encodeURIComponent('칼퇴용 뚝딱 사무도구');
 
+  function star(t, fav) {
+    var on = fav.indexOf(t.id) >= 0, s = el('button', 'star', on ? '★' : '☆');
+    s.type = 'button'; s.setAttribute('aria-pressed', String(on)); s.setAttribute('aria-label', t.t + ' 즐겨찾기'); s.title = '즐겨찾기(작은 창에도 나와요)';
+    s.addEventListener('click', function () { var f = M.get('fav', []), i = f.indexOf(t.id); if (i >= 0) f.splice(i, 1); else f.push(t.id); M.set('fav', f); });
+    return s;
+  }
+  document.querySelectorAll('.cnt').forEach(function (e) { e.textContent = Object.keys(ALL).length; });
+
+  /* 전체 보기 */
+  var allCat = '';
+  function drawAllView() {
+    var q = $('allQ').value.trim().toLowerCase().replace(/\s+/g, ''), fav = M.get('fav', []), box = $('allBody'), chips = $('allChips'), n = 0, act = document.activeElement, keep = act && act.getAttribute('data-k');
+    chips.textContent = ''; box.textContent = '';
+    [{ id: '', name: '모두', icon: '🗂️', c: 'var(--ink)' }].concat(CATS).forEach(function (c) {
+      var b = el('button', 'chp' + (allCat === c.id ? ' on' : ''), c.icon + ' ' + c.name + (c.tools ? ' ' + c.tools.length : '')); b.type = 'button'; b.style.setProperty('--c', c.c); b.setAttribute('aria-pressed', String(allCat === c.id)); b.setAttribute('data-k', 'c' + c.id);
+      b.addEventListener('click', function () { allCat = c.id; drawAllView(); }); chips.append(b);
+    });
+    CATS.forEach(function (c) {
+      if (allCat && allCat !== c.id) return;
+      var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + t.w + (t.k || '') + c.name + c.cry).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
+      if (!ts.length) return; n += ts.length;
+      var s = el('section', 'ag'), h = el('h2', '', c.icon + ' ' + c.name + ' '), ul = el('ul'); s.style.setProperty('--c', c.c); h.append(el('small', '', '「' + c.cry + '」')); s.append(h, ul);
+      ts.forEach(function (t) {
+        var li = el('li'), a = el('a'), st = star(t, fav), w = el('p', 'aw'), nm = el('div', 'an'); a.href = '#' + t.id; st.setAttribute('data-k', 's' + t.id);
+        nm.append(el('b', '', t.t), el('span', '', t.d)); w.append(el('em', '', '이럴 때 쓰면 좋아요'), el('span', '', t.w)); a.append(nm, w); li.append(a, st); ul.append(li);
+      });
+      box.append(s);
+    });
+    $('allNone').hidden = n > 0;
+    if (keep) { var f = document.querySelector('#all [data-k="' + keep + '"]'); if (f) f.focus(); }
+  }
+  $('allQ').addEventListener('input', drawAllView);
+
   /* 왼쪽 목록 */
   var openGrp = M.get('grp', ['xl']);
   function drawList() {
     var q = $('q').value.trim().toLowerCase().replace(/\s+/g, ''), box = $('list'), fav = M.get('fav', []), n = 0; box.textContent = '';
     CATS.forEach(function (c) {
-      var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + (t.k || '') + c.name).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
+      var ts = c.tools.filter(function (t) { return !q || (t.t + t.d + t.w + (t.k || '') + c.name).toLowerCase().replace(/\s+/g, '').indexOf(q) >= 0; });
       if (!ts.length) return; n += ts.length;
       var on = !!q || openGrp.indexOf(c.id) >= 0 || (cur && ALL[cur].c === c), g = el('div', 'grp' + (on ? ' on' : '')), b = el('button'), ul = el('ul');
       g.style.setProperty('--c', c.c); b.type = 'button'; b.setAttribute('aria-expanded', String(on));
       var ic = el('span', '', c.icon); ic.setAttribute('aria-hidden', 'true'); b.append(ic, el('span', '', c.name), el('i', '', '›'));
       b.addEventListener('click', function () { var i = openGrp.indexOf(c.id), now = g.classList.toggle('on'); if (now && i < 0) openGrp.push(c.id); if (!now && i >= 0) openGrp.splice(i, 1); b.setAttribute('aria-expanded', String(now)); try { localStorage.setItem('kaltoe.grp', JSON.stringify(openGrp)); } catch (e) {} });
       ts.forEach(function (t) {
-        var li = el('li', t.id === cur ? 'cur' : ''), a = el('a', '', t.t), s = el('button', 'star', fav.indexOf(t.id) >= 0 ? '★' : '☆');
+        var li = el('li', t.id === cur ? 'cur' : ''), a = el('a', '', t.t), s = star(t, fav);
         a.href = '#' + t.id; a.title = t.d; if (t.id === cur) a.setAttribute('aria-current', 'page');
-        s.type = 'button'; s.setAttribute('aria-pressed', String(fav.indexOf(t.id) >= 0)); s.setAttribute('aria-label', t.t + ' 즐겨찾기'); s.title = '즐겨찾기(작은 창에도 나와요)';
-        s.addEventListener('click', function () { var f = M.get('fav', []), i = f.indexOf(t.id); if (i >= 0) f.splice(i, 1); else f.push(t.id); M.set('fav', f); });
         li.append(a, s); ul.append(li);
       });
       g.append(b, ul); box.append(g);
@@ -61,8 +92,9 @@
   /* 도구 열기 */
   function show(id) {
     cur = ALL[id] ? id : '';
-    $('home').hidden = !!cur; $('work').hidden = !cur; $('side').classList.remove('on'); $('menuBtn').setAttribute('aria-expanded', 'false');
-    document.title = (cur ? ALL[cur].t.t + ' — ' : '') + '칼퇴용 뚝딱 사무도구';
+    var all = id === 'all'; $('all').hidden = !all; $('allLink').classList.toggle('cur', all); if (all) drawAllView();
+    $('home').hidden = !!cur || all; $('work').hidden = !cur; $('side').classList.remove('on'); $('menuBtn').setAttribute('aria-expanded', 'false');
+    document.title = (cur ? ALL[cur].t.t + ' — ' : all ? '전체 보기 — ' : '') + '칼퇴용 뚝딱 사무도구';
     if (cur) {
       var o = opened.filter(function (x) { return x.id === cur; })[0];
       if (!o) {
@@ -114,7 +146,7 @@
   var un = M.mount($('dockMini'), { open: window.KT_OPEN }), pip = null;
   var narrow = matchMedia('(max-width:1180px)'), dockOn = narrow.matches ? false : M.get('dock', true);
   function dock(on, keep) { dockOn = on; $('dock').classList.toggle('hide', !on); $('dockBtn').setAttribute('aria-pressed', String(on)); if (keep && !narrow.matches) try { localStorage.setItem('kaltoe.dock', JSON.stringify(on)); } catch (e) {} }
-  dock(dockOn); $('dockBtn').addEventListener('click', function () { dock(!dockOn, true); });
+  dock(dockOn); narrow.addEventListener('change', function () { dock(narrow.matches ? false : M.get('dock', true)); }); $('dockBtn').addEventListener('click', function () { dock(!dockOn, true); });
   function setAway(on) { $('dockMini').hidden = on; $('away').hidden = !on; }
   async function pop() {
     if (pip && !pip.closed) { pip.focus(); return; }
@@ -123,7 +155,7 @@
         var w = await window.documentPictureInPicture.requestWindow({ width: 330, height: 640 });
         pip = w; var dd = w.document; dd.documentElement.lang = 'ko'; dd.title = '칼퇴 작은 창';
         var th = document.documentElement.getAttribute('data-theme'); if (th) dd.documentElement.setAttribute('data-theme', th);
-        ['app.css?v=1', 'mini.css?v=1'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
+        ['app.css?v=2', 'mini.css?v=1'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
         dd.body.className = 'mini-win'; var box = dd.createElement('div'); dd.body.append(box);
         var off = M.mount(box, { open: function (id) { window.focus(); window.KT_OPEN(id); } });
         setAway(true); w.addEventListener('pagehide', function () { off(); pip = null; setAway(false); });
@@ -144,6 +176,6 @@
     try { localStorage.setItem('kaltoe.theme', nx); } catch (e) {}
   });
   $('menuBtn').addEventListener('click', function () { var on = $('side').classList.toggle('on'); this.setAttribute('aria-expanded', String(on)); });
-  M.on(function () { drawList(); drawSky(); });
+  M.on(function () { drawList(); drawSky(); if (!$('all').hidden) drawAllView(); });
   route();
 })();
