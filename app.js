@@ -163,7 +163,7 @@
         var w = await window.documentPictureInPicture.requestWindow({ width: 330, height: 640 });
         pip = w; var dd = w.document; dd.documentElement.lang = 'ko'; dd.title = '칼퇴 작은 창';
         var th = document.documentElement.getAttribute('data-theme'); if (th) dd.documentElement.setAttribute('data-theme', th);
-        ['app.css?v=4', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
+        ['app.css?v=5', 'mini.css?v=2'].forEach(function (h) { var l = dd.createElement('link'); l.rel = 'stylesheet'; l.href = new URL(h, location.href).href; dd.head.append(l); });
         dd.body.className = 'mini-win'; var box = dd.createElement('div'); dd.body.append(box);
         var off = M.mount(box, { open: function (id) { window.focus(); window.KT_OPEN(id); } });
         setAway(true); w.addEventListener('pagehide', function () { off(); pip = null; setAway(false); });
@@ -184,6 +184,13 @@
     try { localStorage.setItem('kaltoe.theme', nx); } catch (e) {}
   });
   $('menuBtn').addEventListener('click', function () { var on = $('side').classList.toggle('on'); this.setAttribute('aria-expanded', String(on)); });
+  /* 처음 여는 사람에게 꼭 보이는 안내 창 (확인을 눌러야 닫힘, 확인한 것은 이 브라우저에 기억) */
+  var nt = $('nt'), agreed = false; try { agreed = !!localStorage.getItem('kaltoe.agree'); } catch (e) {}
+  nt.addEventListener('cancel', function (e) { if (!agreed) e.preventDefault(); });
+  nt.addEventListener('close', function () { if (!agreed) nt.showModal(); });
+  $('ntOk').addEventListener('click', function () { agreed = true; try { localStorage.setItem('kaltoe.agree', new Date().toISOString().slice(0, 10)); } catch (e) {} nt.close(); });
+  $('ntAgain').addEventListener('click', function () { nt.showModal(); });
+  if (!agreed) nt.showModal();
   M.on(function () { drawList(); drawSky(); if (!$('all').hidden) drawAllView(); });
   route();
 })();

@@ -19,7 +19,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="app.css?v=4">
+<link rel="stylesheet" href="app.css?v=5">
 <link rel="stylesheet" href="mini.css?v=2">
 <script>try{var t=localStorage.getItem('kaltoe.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
@@ -52,10 +52,11 @@
       <div class="recent" id="recent" hidden></div>
       <div class="cats" id="cats"></div>
       <section class="rule">
-        <h2>쓰기 전에</h2>
+        <h2>쓰기 전에 <button type="button" class="lk" id="ntAgain">안내 창 다시 보기</button></h2>
         <ul>
           <li><b>파일은 내 컴퓨터 밖으로 나가지 않아요.</b> 이 브라우저 안에서만 읽고 만들어요. 메모·설정도 이 브라우저에만 남아요. 같은 PC를 함께 쓰면 메모에 개인정보를 적지 마세요.</li>
-          <li><b>결과는 꼭 확인하고 쓰세요.</b> 한 사람이 현장에서 쓰며 만든 참고용 도구라, 쓰는 책임은 쓰는 사람에게 있어요.</li>
+          <li><b>쓸지 말지의 선택과 그 책임은 쓰는 개인에게 있어요.</b> 이 도구를 써서 생긴 결과에 개발자는 관여하지 않으며 책임지지 않아요.</li>
+          <li><b>결과는 꼭 확인하고 쓰세요.</b> 한 사람이 현장에서 쓰며 만든 참고용 도구예요. 제출하거나 보내기 전에 원본과 견주어 보세요.</li>
           <li><b>회사에서 막힐 수 있어요.</b> 우편번호 찾기와 사진 손질방의 AI 배경 지우기는 바깥에서 자료를 받아 와요. 나머지는 이 사이트 안에서 돌아가요.</li>
           <li><b>내 스타일로 바꿔 쓰세요.</b> 줄인 시간은 동료와 나에게 돌려주세요.</li>
         </ul>
@@ -83,10 +84,21 @@
   </main>
   <aside class="dock" id="dock" aria-label="시계·달력·메모"><div id="dockMini"></div><p class="away" id="away" hidden>작은 창에 띄워 두었어요.<br><button class="act" type="button" id="backBtn">다시 여기에 두기</button></p></aside>
 </div>
+<dialog class="nt" id="nt" aria-labelledby="ntH">
+  <img src="img/gyun.webp" alt="" width="84" height="84">
+  <h2 id="ntH">쓰기 전에 꼭 읽어 주세요</h2>
+  <p class="ntm">이 도구를 쓸지 말지의 <b>선택과 그에 따른 책임은 쓰는 개인에게 있으며, 개발자는 무관합니다.</b></p>
+  <ul>
+    <li>한 사람이 현장에서 쓰며 만든 <b>참고용 도구</b>예요. 결과는 꼭 원본과 견주어 확인한 뒤 쓰세요.</li>
+    <li>넣은 파일은 이 브라우저 안에서만 다뤄요. 다만 <b>내가 다니는 곳의 보안·개인정보 규정</b>은 스스로 확인하고 지켜 주세요.</li>
+    <li>메모와 설정은 이 PC의 브라우저에 남아요. 여럿이 쓰는 PC에는 개인정보를 적지 마세요.</li>
+  </ul>
+  <button type="button" class="ntok" id="ntOk">읽었어요, 시작할게요</button>
+</dialog>
 <div class="stamp" id="stamp" role="status" aria-live="polite"></div>
 <script src="tools.js?v=5"></script>
 <script src="icons.js?v=2"></script>
 <script src="mini.js?v=2"></script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

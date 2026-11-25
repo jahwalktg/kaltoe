@@ -89,6 +89,14 @@ button,input{font:inherit;color:inherit}button{cursor:pointer}a{color:inherit}
 .maker{margin-top:18px;padding:18px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;gap:18px;align-items:center}
 .maker img{flex:none;border-radius:14px}
 .maker h2{margin:0;font-size:1.1rem}.maker p{margin:4px 0;font-size:.92rem}.maker .role{color:var(--main);font-weight:600;font-size:.9rem}.maker a{color:var(--main)}
+.lk{border:0;background:none;color:var(--main);text-decoration:underline;font-size:.86rem;padding:2px 6px}
+.nt{width:min(520px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;border:1px solid var(--line);border-radius:14px;padding:24px;background:var(--surface);color:var(--ink);box-shadow:0 12px 50px #0005}
+.nt::backdrop{background:#0f1c1d99}
+.nt>img{display:block;margin:0 auto 4px}
+.nt h2{margin:0 0 12px;text-align:center;font-size:1.3rem}
+.ntm{margin:0 0 12px;padding:13px 16px;border-radius:12px;background:#fff3d6;color:#1d2b2d;font-size:1.04rem}
+.nt ul{margin:0 0 18px;padding-left:20px;font-size:.94rem}.nt li{margin:5px 0}
+.ntok{width:100%;min-height:46px;border:0;border-radius:9px;background:var(--main);color:var(--on);font-weight:700}
 /* 전체 보기 */
 .all h1{margin-block:0 2px;font-size:1.6rem}.all h1 small{font-size:.95rem;color:var(--muted);font-weight:500}
 .allp{margin-block:0 10px;color:var(--muted)}
