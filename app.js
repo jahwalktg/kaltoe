@@ -146,7 +146,7 @@
   var un = M.mount($('dockMini'), { open: window.KT_OPEN }), pip = null;
   var narrow = matchMedia('(max-width:1180px)'), dockOn = narrow.matches ? false : M.get('dock', true);
   function dock(on, keep) { dockOn = on; $('dock').classList.toggle('hide', !on); $('dockBtn').setAttribute('aria-pressed', String(on)); if (keep && !narrow.matches) try { localStorage.setItem('kaltoe.dock', JSON.stringify(on)); } catch (e) {} }
-  dock(dockOn); narrow.addEventListener('change', function () { dock(narrow.matches ? false : M.get('dock', true)); }); $('dockBtn').addEventListener('click', function () { dock(!dockOn, true); });
+  dock(dockOn); var wasNarrow = narrow.matches; window.addEventListener('resize', function () { var n = innerWidth <= 1180; if (n !== wasNarrow) { wasNarrow = n; dock(n ? false : M.get('dock', true)); } }); $('dockBtn').addEventListener('click', function () { dock(!dockOn, true); });
   function setAway(on) { $('dockMini').hidden = on; $('away').hidden = !on; }
   async function pop() {
     if (pip && !pip.closed) { pip.focus(); return; }
