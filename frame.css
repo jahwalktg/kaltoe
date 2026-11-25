@@ -1,0 +1,5 @@
+/* 도구 화면(t/…)에 공통으로 덧씌우는 모양 — 첫 화면 틀 안에서 열리므로 길 안내·바닥글을 감춘다 */
+@font-face{font-family:"Pretendard";src:url("lib/PretendardVariable.woff2") format("woff2");font-weight:45 920;font-display:swap}
+.crumb{display:none!important}
+.kt-in footer,.kt-in .foot,.kt-in .jt-vid{display:none!important}
+.kt-in body{padding-top:0}

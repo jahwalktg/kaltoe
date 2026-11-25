@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엑셀 합치기·나누기 — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+.tabs{display:flex;gap:8px;margin:12px 0}
+.tabs button{flex:1;max-width:280px;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;text-align:left}
+.tabs button b{display:block;font-size:1.05rem}
+.tabs button span{font-size:.82rem;color:var(--muted)}
+.tabs button.on{border-color:var(--blue);background:var(--soft)}
+table.list{border-collapse:collapse;width:100%;font-size:.86rem}
+table.list th,table.list td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:middle}
+table.list th{color:var(--muted);font-weight:600;font-size:.8rem}
+table.list td.n{text-align:right;white-space:nowrap}
+table.list input[type=text]{width:100%;min-width:90px;padding:4px 7px}
+table.list input[type=number]{width:62px;padding:4px 6px}
+table.list select{max-width:200px;padding:4px 6px}
+table.list tr.off td{opacity:.5}
+.warn{color:var(--amber)}
+.pv{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.pv table{border-collapse:collapse;font-size:.8rem;background:#fff;color:#111;white-space:nowrap}
+.pv th,.pv td{border:1px solid #bbb;padding:2px 6px}
+.pv th{background:#e7e6e6;position:sticky;top:0}
+.pv td.src{color:#555;background:#f6f6f6}
+.vals{display:flex;flex-wrap:wrap;gap:6px 14px;max-height:220px;overflow:auto;padding:4px 0}
+.out{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.mini{font-size:.8rem;padding:3px 9px;min-height:28px}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">여러 엑셀 파일을 <b>한 표로 합치거나</b>, 한 표를 부서·달 같은 칸 기준으로 <b>시트·파일로 나눕니다</b>. 파일마다 맨 위 제목 줄이 있거나 머리글 순서·이름이 조금 달라도 맞춰 줍니다.</p>
+  <div class="tabs" role="tablist">
+    <button type="button" id="tabM" class="on" role="tab"><b>🧩 합치기</b><span>파일 여러 개 → 한 표</span></button>
+    <button type="button" id="tabS" role="tab"><b>✂️ 나누기</b><span>한 표 → 값마다 시트·파일</span></button>
+  </div>
+
+  <!-- ========== 합치기 ========== -->
+  <div id="paneM">
+    <section class="panel">
+      <div class="step"><span class="n">1</span><h2>합칠 파일 넣기</h2></div>
+      <div class="drop" id="dropM">
+        <b>엑셀 파일 여러 개(또는 폴더)를 여기에 끌어다 놓기</b>
+        <div class="hint" style="margin-bottom:8px">xlsx·xls·csv · 나중에 더 넣어도 됩니다</div>
+        <label class="btn"><input type="file" id="fileM" accept=".xlsx,.xls,.xlsm,.csv" multiple hidden>파일 고르기</label>
+        <button type="button" class="btn" id="sampleM">예시 파일로 해 보기</button>
+      </div>
+      <div class="row" style="margin-top:10px"><label class="chk"><input type="checkbox" id="allSheets"> 파일마다 <b>모든 시트</b>를 합치기 (1월·2월… 시트가 나뉜 파일)</label></div>
+      <div class="scroll" style="margin-top:8px"><table class="list" id="fileList"></table></div>
+      <p class="hint" id="fileHint"></p>
+    </section>
+    <section class="panel" id="colPanel" hidden>
+      <div class="step"><span class="n">2</span><h2>칸 맞추기</h2></div>
+      <p class="hint" style="margin-top:0">파일마다 머리글 이름이 다르면(예: 「성명」과 「이름」) <b>합칠 이름</b>을 같게 적으면 한 칸이 됩니다. 필요 없는 칸은 「넣기」를 끄세요.</p>
+      <div class="scroll"><table class="list" id="colList"></table></div>
+      <div class="row" style="margin-top:10px">
+        <label class="chk"><input type="checkbox" id="srcCol" checked> 맨 앞에 「출처」 칸 (어느 파일·시트에서 왔는지)</label>
+        <label class="chk"><input type="checkbox" id="skipSum" checked> 「합계·소계·계」 줄 빼기</label>
+        <label class="chk"><input type="checkbox" id="skipHead" checked> 중간에 되풀이된 머리글 줄 빼기</label>
+      </div>
+    </section>
+    <section class="panel" id="outPanelM" hidden>
+      <div class="step"><span class="n">3</span><h2>미리 보기 · 받기</h2><span class="hint" id="sumM"></span></div>
+      <div class="pv" id="pvM"></div>
+      <div class="out">
+        <label class="f" style="min-width:220px">파일 이름<input type="text" id="nameM" value="합친 표"></label>
+        <button type="button" class="btn main" id="dlM">합친 엑셀 받기</button>
+        <span class="hint">머리글 고정·거르기 단추·테두리가 들어간 xlsx로 받습니다.</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========== 나누기 ========== -->
+  <div id="paneS" hidden>
+    <section class="panel">
+      <div class="step"><span class="n">1</span><h2>나눌 파일 넣기</h2></div>
+      <div class="drop" id="dropS">
+        <b>엑셀 파일 하나를 여기에 끌어다 놓기</b>
+        <div class="hint" style="margin-bottom:8px">xlsx·xls·csv</div>
+        <label class="btn"><input type="file" id="fileS" accept=".xlsx,.xls,.xlsm,.csv" hidden>파일 고르기</label>
+        <button type="button" class="btn" id="sampleS">예시 파일로 해 보기</button>
+      </div>
+      <div class="row" id="sRow" hidden style="margin-top:10px">
+        <label class="f">시트<select id="sSheet"></select></label>
+        <label class="f">머리글 줄 (몇 번째 줄)<input type="number" id="sHead" min="1" max="50" value="1"></label>
+        <label class="f">나눌 기준 칸<select id="sKey"></select></label>
+      </div>
+      <p class="hint" id="sInfo"></p>
+    </section>
+    <section class="panel" id="sPanel2" hidden>
+      <div class="step"><span class="n">2</span><h2>나눌 값 고르기</h2><span class="hint" id="sCnt"></span></div>
+      <div class="row" style="margin-bottom:6px"><button type="button" class="btn mini" id="sAll">모두</button><button type="button" class="btn mini" id="sNone">모두 끄기</button></div>
+      <div class="vals" id="sVals"></div>
+      <div class="row" style="margin-top:10px">
+        <label class="chk"><input type="radio" name="sMode" value="sheets" checked> 한 파일 안에 <b>값마다 시트</b> 하나</label>
+        <label class="chk"><input type="radio" name="sMode" value="files"> <b>값마다 파일</b> 하나 (zip으로 묶어 받기)</label>
+        <label class="chk"><input type="checkbox" id="sKeepTop" checked> 머리글 위 제목 줄도 나눈 표마다 넣기</label>
+        <label class="chk"><input type="checkbox" id="sAllSheet"> 맨 앞에 「전체」 시트도</label>
+      </div>
+      <div class="out"><button type="button" class="btn main" id="dlS">나눈 엑셀 받기</button><span class="hint" id="sOutHint"></span></div>
+    </section>
+  </div>
+  <section class="panel">
+    <h2>알아 두기</h2>
+    <ul class="hint" style="margin:0;padding-left:18px">
+      <li>받은 파일에는 <b>값만</b> 들어갑니다(수식은 계산된 값으로). 날짜·숫자 모양(쉼표)은 원래 파일을 따라갑니다.</li>
+      <li>합친 칸(병합)이 있는 머리글은 첫 칸 이름을 씁니다. 머리글이 두 줄이면 「머리글 줄」을 아래 줄로 바꿔 주세요.</li>
+      <li>암호가 걸린 파일은 엑셀에서 암호를 푼 뒤 넣어 주세요.</li>
+    </ul>
+  </section>
+  
+</div>
+<script src="../../../lib/xlsx.full.min.js"></script>
+<script src="../lib/hwpx.js?v=1"></script>
+<script src="../lib/xlsxw.js?v=3"></script>
+<script src="../core.js?v=7"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc;
+  O.header('xlmerge');
+  /* ---------- 공통: 엑셀 읽기 ---------- */
+  function readBook(f) {
+    return O.readBuf(f).then(function (buf) {
+      var u8 = new Uint8Array(buf);
+      if (/\.csv$/i.test(f.name)) {   // 한글 csv는 대개 CP949 — UTF-8로 안 풀리면 euc-kr로
+        var txt; try { txt = new TextDecoder('utf-8', { fatal: true }).decode(u8); } catch (e) { txt = new TextDecoder('euc-kr').decode(u8); }
+        return XLSX.read(txt.replace(/^﻿/, ''), { type: 'string', cellNF: true });
+      }
+      return XLSX.read(u8, { type: 'array', cellNF: true });
+    });
+  }
+  /* 시트 → 칸 객체 2차원 배열 { v, t, z, w } (합친 칸은 첫 칸 값만) */
+  function grid(ws) {
+    if (!ws || !ws['!ref']) return [];
+    var rg = XLSX.utils.decode_range(ws['!ref']), out = [];
+    for (var r = rg.s.r; r <= rg.e.r; r++) {
+      var row = [];
+      for (var c = rg.s.c; c <= rg.e.c; c++) { var x = ws[XLSX.utils.encode_cell({ r: r, c: c })]; row.push(x && x.v != null && x.v !== '' ? { v: x.v, t: x.t, z: x.z, w: x.w != null ? String(x.w) : String(x.v) } : null); }
+      out.push(row);
+    }
+    return out;
+  }
+  function txt(x) { return x ? String(x.w != null ? x.w : x.v).trim() : ''; }
+  function isNumLike(s) { return /^[-+]?[\d,]*\.?\d+%?$/.test(s); }
+  /* 머리글 줄 찾기: 위 20줄 중 글자 칸이 가장 많은 줄 근처에서 처음 나오는 줄 */
+  function findHead(g) {
+    var lim = Math.min(g.length, 20), cnt = [], mx = 0;
+    for (var r = 0; r < lim; r++) { var ne = 0, tx = 0; g[r].forEach(function (x) { var t = txt(x); if (t) { ne++; if (!isNumLike(t)) tx++; } }); cnt[r] = tx >= ne * .6 ? ne : 0; mx = Math.max(mx, cnt[r]); }
+    for (var k = 0; k < lim; k++) if (mx >= 2 && cnt[k] >= Math.max(2, mx * .7)) return k;
+    return 0;
+  }
+  function headNames(g, h) {
+    var row = g[h] || [], seen = {};
+    return row.map(function (x, i) { var n = txt(x).replace(/\s*\n\s*/g, ' ') || ('칸' + (i + 1)); if (seen[n]) { seen[n]++; n = n + '(' + seen[n] + ')'; } else seen[n] = 1; return n; });
+  }
+  function keyOf(n) { return String(n).replace(/[\s()（）\[\]·.]/g, '').toLowerCase(); }
+  /* 흔히 같은 뜻인 머리글 — 처음부터 같은 「합칠 이름」으로 (고칠 수 있음) */
+  var SYN = [['성명', '이름', '성함', '참여자명', '참여자', '대상자명', '대상자'], ['생년월일', '생일', '출생일'], ['연락처', '전화번호', '휴대폰', '휴대전화', '핸드폰', '전화'], ['사업단', '사업단명', '사업단이름'], ['비고', '메모', '특이사항'], ['연번', '번호', '순번', 'no']];
+  function synOf(n) { var k = keyOf(n); for (var i = 0; i < SYN.length; i++) if (SYN[i].indexOf(k) >= 0) return SYN[i][0]; return null; }
+  var SUMRE = /^(합\s*계|소\s*계|총\s*계|계|누\s*계|total|sum)$/i;
+  function rowEmpty(r) { return !r.some(function (x) { return txt(x); }); }
+  /* 엑셀 쓰기용 칸: 원래 숫자 모양 따라 */
+  function outCell(x) {
+    if (!x) return { v: '', s: 'textL' };
+    if (x.t === 'n') {
+      if (x.z && XLSX.SSF.is_date(x.z)) return { v: x.v, s: 'date' };
+      if (/%/.test(x.z || '')) return { v: x.v, s: /\.0/.test(x.z) ? 'pct2' : 'pct' };
+      return { v: x.v, s: /[#0],[#0]/.test(x.z || '') ? 'num' : 'gen' };
+    }
+    if (x.t === 'b') return { v: x.v ? 'TRUE' : 'FALSE', s: 'text' };
+    return { v: txt(x), s: 'textL' };
+  }
+  function vlen(s) { var n = 0; s = String(s); for (var i = 0; i < s.length && i < 80; i++) n += s.charCodeAt(i) > 0x2e80 ? 2 : 1; return n; }
+  function widths(rows) { var w = []; rows.slice(0, 400).forEach(function (r) { r.forEach(function (c, i) { var t = c && c.v != null ? (c.s === 'num' && typeof c.v === 'number' ? c.v.toLocaleString() : c.s === 'date' ? '2026-01-01' : /^pct/.test(c.s) ? '100.00%' : c.v) : ''; w[i] = Math.max(w[i] || 8, Math.min(44, vlen(t) + 2)); }); }); return w; }
+  function sheetName(n, used) { var s = String(n || '빈 값').replace(/[\[\]:*?\/\\]/g, ' ').trim().slice(0, 28) || '빈 값', b = s, k = 2; while (used[s.toLowerCase()]) s = b.slice(0, 25) + '(' + (k++) + ')'; used[s.toLowerCase()] = 1; return s; }
+  function fileSafe(n) { return String(n || '빈 값').replace(/[\\\/:*?"<>|]/g, ' ').trim().slice(0, 60) || '빈 값'; }
+  function bookSheet(name, head, body, top) {
+    var rows = [], merges = [], W = head.length;
+    (top || []).forEach(function (t) { rows.push([{ v: t, s: 'bold' }]); });
+    var hr = rows.length; rows.push(head.map(function (h) { return { v: h, s: 'head' }; }));
+    body.forEach(function (r) { rows.push(r); });
+    var last = XLSX.utils.encode_col(Math.max(0, W - 1));
+    return { name: name, cols: widths(rows.slice(hr)), rows: rows, freeze: hr + 1, filter: 'A' + (hr + 1) + ':' + last + (rows.length), printTitles: (hr + 1) + ':' + (hr + 1), landscape: W > 7 };
+  }
+
+  /* ---------- 탭 ---------- */
+  function tab(m) { $('tabM').classList.toggle('on', m === 'M'); $('tabS').classList.toggle('on', m === 'S'); $('paneM').hidden = m !== 'M'; $('paneS').hidden = m !== 'S'; }
+  $('tabM').onclick = function () { tab('M'); }; $('tabS').onclick = function () { tab('S'); };
+  if (location.hash === '#split') tab('S');
+
+  /* ========== 합치기 ========== */
+  var books = [];   // { id, name, wb, sheet(이름 또는 '*'), heads: {시트: 줄번호0} }
+  var colMap = {};  // key → { name, target, use }
+  var bid = 0;
+  function addBooks(files) {
+    var fs = files.filter(function (f) { return /\.(xlsx|xlsm|xls|csv)$/i.test(f.name) && !/^~\$/.test(f.name); });
+    if (!fs.length) { O.toast('엑셀(xlsx·xls)이나 csv 파일을 넣어 주세요.'); return; }
+    Promise.all(fs.map(function (f) {
+      if (books.some(function (b) { return b.name === f.name && b.size === f.size; })) return null;
+      return readBook(f).then(function (wb) { return { id: ++bid, name: f.name, size: f.size, wb: wb, sheet: wb.SheetNames[0], heads: {}, use: true }; }, function (e) { O.toast(f.name + ': 열지 못했습니다(암호?)', 4000); return null; });
+    })).then(function (list) { list.filter(Boolean).forEach(function (b) { books.push(b); }); books.sort(function (a, b) { return a.name.localeCompare(b.name, 'ko', { numeric: true }); }); renderFiles(); });
+  }
+  function parts(b) {   // 이 파일에서 합칠 (시트, 머리글 줄) 목록
+    var names = $('allSheets').checked ? b.wb.SheetNames : [b.sheet];
+    return names.map(function (sn) { var g = grid(b.wb.Sheets[sn]); if (b.heads[sn] == null) b.heads[sn] = findHead(g); return { sn: sn, g: g, h: b.heads[sn] }; }).filter(function (p) { return p.g.length > p.h + 0; });
+  }
+  function renderFiles() {
+    var h = '<tr><th>넣기</th><th>파일</th><th>시트</th><th>머리글 줄</th><th class="n">줄 수</th><th>머리글</th><th></th></tr>', all = $('allSheets').checked;
+    books.forEach(function (b) {
+      parts(b).forEach(function (p, i) {
+        var n = p.g.slice(p.h + 1).filter(function (r) { return !rowEmpty(r); }).length, hn = headNames(p.g, p.h);
+        h += '<tr class="' + (b.use ? '' : 'off') + '">' + (i === 0 ? '<td><input type="checkbox" data-use="' + b.id + '"' + (b.use ? ' checked' : '') + ' aria-label="이 파일 넣기"></td><td><b>' + esc(b.name) + '</b></td>' : '<td></td><td></td>') +
+          '<td>' + (all ? esc(p.sn) : '<select data-sheet="' + b.id + '">' + b.wb.SheetNames.map(function (s) { return '<option' + (s === b.sheet ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>') + '</td>' +
+          '<td><input type="number" min="1" max="50" value="' + (p.h + 1) + '" data-head="' + b.id + '" data-sn="' + esc(p.sn) + '" aria-label="머리글 줄"></td><td class="n">' + n + '</td><td class="hint" style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(hn.join(' | ')) + '">' + esc(hn.slice(0, 6).join(' | ')) + (hn.length > 6 ? ' …' : '') + '</td>' +
+          (i === 0 ? '<td><button type="button" class="btn mini" data-del="' + b.id + '">빼기</button></td>' : '<td></td>') + '</tr>';
+      });
+    });
+    $('fileList').innerHTML = books.length ? h : '';
+    $('fileHint').textContent = books.length ? '파일 ' + books.length + '개 · 머리글 줄이 틀리면 숫자를 고치세요(맨 위 제목 줄은 자동으로 건너뜀).' : '';
+    $('fileList').querySelectorAll('[data-use]').forEach(function (c) { c.onchange = function () { byId(c.dataset.use).use = c.checked; renderFiles(); }; });
+    $('fileList').querySelectorAll('[data-sheet]').forEach(function (c) { c.onchange = function () { byId(c.dataset.sheet).sheet = c.value; renderFiles(); }; });
+    $('fileList').querySelectorAll('[data-head]').forEach(function (c) { c.onchange = function () { byId(c.dataset.head).heads[c.dataset.sn] = Math.max(0, (+c.value || 1) - 1); renderFiles(); }; });
+    $('fileList').querySelectorAll('[data-del]').forEach(function (c) { c.onclick = function () { books = books.filter(function (b) { return b.id !== +c.dataset.del; }); renderFiles(); }; });
+    buildCols();
+  }
+  function byId(id) { return books.filter(function (b) { return b.id === +id; })[0]; }
+  function buildCols() {
+    var order = [], seen = {}, files = books.filter(function (b) { return b.use; }), totalParts = 0;
+    files.forEach(function (b) { parts(b).forEach(function (p) { totalParts++; var got = {}; headNames(p.g, p.h).forEach(function (n) { var k = keyOf(n); if (got[k]) return; got[k] = 1; if (!seen[k]) { seen[k] = { n: n, cnt: 0 }; order.push(k); } seen[k].cnt++; }); }); });
+    order.forEach(function (k) { if (!colMap[k]) colMap[k] = { name: seen[k].n, target: synOf(seen[k].n) && order.some(function (o) { return o !== k && synOf(seen[o].n) === synOf(seen[k].n); }) ? synOf(seen[k].n) : seen[k].n, use: !/^칸\d+$/.test(seen[k].n) }; colMap[k].cnt = seen[k].cnt; });
+    colMap._order = order; colMap._parts = totalParts;
+    var h = '<tr><th>넣기</th><th>머리글</th><th>들어 있는 곳</th><th>합칠 이름</th></tr>';
+    order.forEach(function (k) { var c = colMap[k]; h += '<tr class="' + (c.use ? '' : 'off') + '"><td><input type="checkbox" data-cu="' + esc(k) + '"' + (c.use ? ' checked' : '') + ' aria-label="이 칸 넣기"></td><td>' + esc(c.name) + '</td><td class="' + (c.cnt < totalParts ? 'warn' : '') + '">' + c.cnt + ' / ' + totalParts + (c.cnt < totalParts ? ' (없는 곳은 빈칸)' : '') + '</td><td><input type="text" value="' + esc(c.target) + '" data-ct="' + esc(k) + '" aria-label="합칠 이름"></td></tr>'; });
+    $('colList').innerHTML = h;
+    $('colPanel').hidden = $('outPanelM').hidden = !order.length;
+    $('colList').querySelectorAll('[data-cu]').forEach(function (c) { c.onchange = function () { colMap[c.dataset.cu].use = c.checked; c.closest('tr').classList.toggle('off', !c.checked); preview(); }; });
+    $('colList').querySelectorAll('[data-ct]').forEach(function (c) { c.oninput = function () { colMap[c.dataset.ct].target = c.value.trim() || colMap[c.dataset.ct].name; previewSoon(); }; });
+    preview();
+  }
+  function merged() {
+    var targets = [], tIdx = {}, src = $('srcCol').checked, skipSum = $('skipSum').checked, skipHead = $('skipHead').checked, rows = [], stat = [];
+    colMap._order.forEach(function (k) { var c = colMap[k]; if (!c.use) return; var t = c.target; if (tIdx[t] == null) { tIdx[t] = targets.length; targets.push(t); } });
+    var multi = $('allSheets').checked;
+    books.filter(function (b) { return b.use; }).forEach(function (b) {
+      parts(b).forEach(function (p) {
+        var hn = headNames(p.g, p.h), map = hn.map(function (n) { var c = colMap[keyOf(n)]; return c && c.use ? tIdx[c.target] : null; }), hk = hn.map(keyOf).join('|'), n = 0, label = b.name.replace(/\.[^.]+$/, '') + (multi || b.wb.SheetNames.length > 1 ? ' › ' + p.sn : '');
+        p.g.slice(p.h + 1).forEach(function (r) {
+          if (rowEmpty(r)) return;
+          if (skipHead && r.map(function (x, i) { return keyOf(txt(x) || ('칸' + (i + 1))); }).join('|') === hk) return;
+          var first = r.filter(function (x) { return txt(x); })[0]; if (skipSum && first && SUMRE.test(txt(first).replace(/\s/g, ''))) return;
+          var out = targets.map(function () { return null; });
+          r.forEach(function (x, i) { var t = map[i]; if (t != null && x && !out[t]) out[t] = x; });
+          if (!out.some(Boolean)) return;
+          rows.push({ src: label, cells: out }); n++;
+        });
+        stat.push(label + ' ' + n + '줄');
+      });
+    });
+    return { targets: targets, rows: rows, src: src, stat: stat };
+  }
+  var pvT = 0; function previewSoon() { clearTimeout(pvT); pvT = setTimeout(preview, 300); }
+  function preview() {
+    if (!colMap._order || !colMap._order.length) return;
+    var m = merged(), h = '<table><tr>' + (m.src ? '<th>출처</th>' : '') + m.targets.map(function (t) { return '<th>' + esc(t) + '</th>'; }).join('') + '</tr>';
+    m.rows.slice(0, 40).forEach(function (r) { h += '<tr>' + (m.src ? '<td class="src">' + esc(r.src) + '</td>' : '') + r.cells.map(function (x) { var c = outCell(x); return '<td' + (typeof c.v === 'number' ? ' style="text-align:right"' : '') + '>' + esc(c.s === 'date' ? XLSX.SSF.format('yyyy-mm-dd', c.v) : c.s === 'num' ? Number(c.v).toLocaleString() : /^pct/.test(c.s) ? XLSX.SSF.format(c.s === 'pct' ? '0%' : '0.00%', c.v) : c.v) + '</td>'; }).join('') + '</tr>'; });
+    $('pvM').innerHTML = h + '</table>' + (m.rows.length > 40 ? '<p class="hint" style="padding:4px 8px;margin:0">… 앞 40줄만 보임 (모두 ' + m.rows.length + '줄)</p>' : '');
+    $('sumM').textContent = '모두 ' + m.rows.length + '줄 × ' + (m.targets.length + (m.src ? 1 : 0)) + '칸 · ' + m.stat.join(', ');
+  }
+  ['srcCol', 'skipSum', 'skipHead'].forEach(function (id) { $(id).onchange = preview; });
+  $('allSheets').onchange = function () { colMap = {}; renderFiles(); };
+  $('dlM').onclick = function () {
+    var m = merged(); if (!m.rows.length) { O.toast('합칠 줄이 없습니다.'); return; }
+    var head = (m.src ? ['출처'] : []).concat(m.targets);
+    var body = m.rows.map(function (r) { return (m.src ? [{ v: r.src, s: 'textL' }] : []).concat(r.cells.map(outCell)); });
+    var name = fileSafe($('nameM').value || '합친 표');
+    O.download(name + '.xlsx', Xlsxw.book(bookSheet('합친 표', head, body))); O.toast(m.rows.length + '줄을 합쳐 내려받았습니다.');
+  };
+  O.bindDrop($('dropM'), $('fileM'), addBooks);
+
+  /* ========== 나누기 ========== */
+  var sBook = null, sName = '';
+  function sGrid() { return grid(sBook.wb.Sheets[$('sSheet').value]); }
+  function loadSplit(files) {
+    var f = files.filter(function (x) { return /\.(xlsx|xlsm|xls|csv)$/i.test(x.name); })[0]; if (!f) { O.toast('엑셀(xlsx·xls)이나 csv 파일을 넣어 주세요.'); return; }
+    readBook(f).then(function (wb) {
+      sBook = { wb: wb }; sName = f.name.replace(/\.[^.]+$/, '');
+      $('sSheet').innerHTML = wb.SheetNames.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('');
+      $('sRow').hidden = false; onSheet();
+    }, function () { $('sInfo').textContent = '파일을 열지 못했습니다(암호가 걸렸거나 다른 형식).'; });
+  }
+  function onSheet() { var g = sGrid(); $('sHead').value = findHead(g) + 1; onHead(true); }
+  function onHead(guessKey) {
+    var g = sGrid(), h = Math.max(0, (+$('sHead').value || 1) - 1), hn = headNames(g, h), old = $('sKey').value;
+    var cand = hn.map(function (n, i) { var vals = {}; g.slice(h + 1).forEach(function (r) { var t = txt(r[i]); if (t) vals[t] = 1; }); return { i: i, n: n, k: Object.keys(vals).length }; });
+    $('sKey').innerHTML = cand.map(function (c) { return '<option value="' + c.i + '">' + esc(c.n) + ' (' + c.k + '가지)</option>'; }).join('');
+    var pref = cand.filter(function (c) { return /사업단|부서|팀|구분|지점|점포|기관|담당|월/.test(c.n) && c.k >= 2 && c.k <= 60; })[0] || cand.filter(function (c) { return c.k >= 2 && c.k <= 40; })[0];
+    if (!guessKey && old && cand[+old]) $('sKey').value = old; else if (pref) $('sKey').value = pref.i;
+    $('sInfo').textContent = sName + ' › ' + $('sSheet').value + ' · 데이터 ' + g.slice(h + 1).filter(function (r) { return !rowEmpty(r); }).length + '줄 · 머리글: ' + hn.slice(0, 8).join(' | ') + (hn.length > 8 ? ' …' : '');
+    onKey();
+  }
+  var sSel = {};
+  function groups() {
+    var g = sGrid(), h = Math.max(0, (+$('sHead').value || 1) - 1), ki = +$('sKey').value, map = {}, order = [], skip = 0;
+    g.slice(h + 1).forEach(function (r) {
+      if (rowEmpty(r)) return;
+      var first = r.filter(function (x) { return txt(x); })[0]; if (first && SUMRE.test(txt(first).replace(/\s/g, ''))) { skip++; return; }
+      var v = txt(r[ki]) || '(빈 칸)'; if (!map[v]) { map[v] = []; order.push(v); } map[v].push(r);
+    });
+    order.sort(function (a, b) { return a.localeCompare(b, 'ko', { numeric: true }); });
+    return { g: g, h: h, map: map, order: order, skip: skip, top: g.slice(0, h).map(function (r) { return r.map(txt).filter(Boolean).join('  '); }).filter(Boolean) };
+  }
+  function onKey() {
+    var G = groups(); $('sPanel2').hidden = false;
+    $('sVals').innerHTML = G.order.map(function (v) { if (sSel[v] == null) sSel[v] = true; return '<label class="chk"><input type="checkbox" data-sv="' + esc(v) + '"' + (sSel[v] ? ' checked' : '') + '> ' + esc(v) + ' <span class="hint">' + G.map[v].length + '줄</span></label>'; }).join('');
+    $('sVals').querySelectorAll('[data-sv]').forEach(function (c) { c.onchange = function () { sSel[c.dataset.sv] = c.checked; cnt(); }; });
+    function cnt() { var n = G.order.filter(function (v) { return sSel[v]; }).length; $('sCnt').textContent = G.order.length + '가지 중 ' + n + '개 고름' + (G.skip ? ' · 합계 줄 ' + G.skip + '개는 뺌' : ''); }
+    cnt(); $('sOutHint').textContent = G.order.length > 60 ? '값이 많습니다 — 기준 칸이 맞는지 확인하세요(이름·날짜 칸이면 너무 잘게 나뉩니다).' : '';
+  }
+  $('sSheet').onchange = onSheet; $('sHead').onchange = function () { onHead(false); }; $('sKey').onchange = function () { sSel = {}; onKey(); };
+  $('sAll').onclick = function () { Object.keys(sSel).forEach(function (k) { sSel[k] = true; }); onKey(); };
+  $('sNone').onclick = function () { Object.keys(sSel).forEach(function (k) { sSel[k] = false; }); onKey(); };
+  $('dlS').onclick = function () {
+    var G = groups(), sel = G.order.filter(function (v) { return sSel[v]; }); if (!sel.length) { O.toast('나눌 값을 하나 이상 고르세요.'); return; }
+    var hn = headNames(G.g, G.h), top = $('sKeepTop').checked ? G.top : [], mode = document.querySelector('[name=sMode]:checked').value;
+    var conv = function (rows) { return rows.map(function (r) { return hn.map(function (_, i) { return outCell(r[i]); }); }); };
+    if (mode === 'sheets') {
+      var used = {}, sheets = [];
+      if ($('sAllSheet').checked) sheets.push(bookSheet(sheetName('전체', used), hn, conv([].concat.apply([], sel.map(function (v) { return G.map[v]; }))), top));
+      sel.forEach(function (v) { sheets.push(bookSheet(sheetName(v, used), hn, conv(G.map[v]), top)); });
+      O.download(fileSafe(sName + '_나눔') + '.xlsx', Xlsxw.book({ sheets: sheets })); O.toast(sel.length + '개 시트로 나눠 내려받았습니다.');
+    } else {
+      var usedF = {}, files = sel.map(function (v) { var fn = fileSafe(v) + '_' + fileSafe(sName), b = fn, k = 2; while (usedF[fn]) fn = b + '(' + (k++) + ')'; usedF[fn] = 1; return [fn + '.xlsx', Xlsxw.book(bookSheet(sheetName(v, {}), hn, conv(G.map[v]), top))]; });
+      O.download(fileSafe(sName + '_나눔') + '.zip', Hwpx.zip(files)); O.toast(sel.length + '개 파일을 zip으로 내려받았습니다.');
+    }
+  };
+  O.bindDrop($('dropS'), $('fileS'), loadSplit);
+
+  /* ---------- 예시 (가상 자료) ---------- */
+  function sampleFile(name, aoa, extra) {
+    var wb = XLSX.utils.book_new(), ws = XLSX.utils.aoa_to_sheet(aoa); if (extra) extra(ws); XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    return new File([XLSX.write(wb, { type: 'array', bookType: 'xlsx' })], name);
+  }
+  var NAMES = ['김하늘', '이바다', '박구름', '최별', '정나무', '한들꽃', '오솔길', '윤햇살', '서은빛', '장마루'];
+  $('sampleM').onclick = function () {
+    var a = sampleFile('가나팀 10월.xlsx', [['가나팀 10월 직원 명단(예시)'], [], ['연번', '성명', '생년월일', '근무일수', '급여'], [1, NAMES[0], '1970-03-02', 21, 1534000], [2, NAMES[1], '1981-11-20', 19, 1388000], [3, NAMES[2], '1965-07-15', 22, 1607000], ['합계', '', '', 62, 4529000]]);
+    var b = sampleFile('다라팀 10월.xlsx', [['연번', '이름', '근무일수', '급여', '비고'], [1, NAMES[3], 20, 1461000, '팀장'], [2, NAMES[4], 18, 1315000, ''], [3, NAMES[5], 21, 1534000, '신규']]);
+    var c = sampleFile('마바팀 10월.xlsx', [['마바팀'], ['연번', '성 명', '생년월일', '근무 일수', '급여'], [1, NAMES[6], '1990-01-09', 22, 1607000], [2, NAMES[7], '1958-05-30', 17, 1242000]]);
+    addBooks([a, b, c]);
+  };
+  $('sampleS').onclick = function () {
+    var rows = [['2026년 10월 직원 급여 현황(예시)'], [], ['연번', '부서', '성명', '근무일수', '급여']], units = ['가나팀', '다라팀', '마바팀'];
+    for (var i = 0; i < 12; i++) rows.push([i + 1, units[i % 3], NAMES[i % 10] + (i >= 10 ? '2' : ''), 15 + (i * 7) % 8, 1100000 + (i * 37000) % 500000]);
+    loadSplit([sampleFile('10월 급여 현황(예시).xlsx', rows)]);
+  };
+  window._xlm = { addBooks: addBooks, loadSplit: loadSplit, merged: merged, groups: groups };
+})();
+</script>
+</body>
+</html>

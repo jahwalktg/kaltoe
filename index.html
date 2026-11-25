@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>칼퇴용 뚝딱 사무도구</title>
+<meta name="description" content="엑셀·한글·PPT·PDF 귀찮은 일을 한 페이지에서 뚝딱. 퇴근 시계·달력·메모를 작은 창으로 띄워 두고 쓰는 무료 사무도구. 설치·로그인 없음, 파일은 내 컴퓨터 밖으로 나가지 않음.">
+<link rel="canonical" href="https://jahwalktg.github.io/kaltoe/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="칼퇴용 뚝딱 사무도구">
+<meta property="og:description" content="엑셀·한글·PPT·PDF 귀찮은 일을 한 페이지에서 뚝딱. 퇴근 시계·달력·메모를 작은 창으로 띄워 두고 쓰는 무료 사무도구.">
+<meta property="og:url" content="https://jahwalktg.github.io/kaltoe/">
+<meta property="og:image" content="https://jahwalktg.github.io/kaltoe/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FFF6E8">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="app.css?v=1">
+<link rel="stylesheet" href="mini.css?v=1">
+<script>try{var t=localStorage.getItem('kaltoe.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<header class="bar">
+  <button class="menu" id="menuBtn" type="button" aria-label="도구 목록 열기" aria-expanded="false" aria-controls="side">☰</button>
+  <a class="logo" href="#" id="homeLink"><img src="img/gyun.webp" alt="" width="34" height="34"><span><b>칼퇴용</b> 뚝딱 사무도구</span></a>
+  <span class="chip" id="chip"></span>
+  <span class="sp"></span>
+  <button class="act" id="popBtn" type="button"><span aria-hidden="true">📌</span> <span class="lg">작은 창 띄우기</span></button>
+  <button class="act ic" id="dockBtn" type="button" aria-pressed="true" title="오른쪽 시계·달력·메모 보이기/숨기기" aria-label="오른쪽 시계·달력·메모 보이기/숨기기">🗓️</button>
+  <button class="act ic" id="themeBtn" type="button" title="밝게/어둡게" aria-label="밝게/어둡게">🌗</button>
+</header>
+<div class="lay">
+  <nav class="side" id="side" aria-label="도구 목록">
+    <div class="find"><input id="q" type="search" placeholder="도구 찾기 (예: 합치기, 연차)" aria-label="도구 찾기" autocomplete="off"></div>
+    <div id="list"></div>
+  </nav>
+  <main class="main" id="main">
+    <section class="home" id="home">
+      <div class="sky" id="sky">
+        <div class="ball" id="sun" aria-hidden="true"></div>
+        <div class="hill" aria-hidden="true"></div>
+        <div class="skytx"><p class="k" id="skyK"></p><h1 id="skyH"></h1><p class="s" id="skyS"></p></div>
+        <img class="gyun" src="img/gyun.webp" alt="" width="132" height="132">
+      </div>
+      <div class="recent" id="recent" hidden></div>
+      <h2 class="ask">지금 무슨 일로 퇴근이 늦어지나요?</h2>
+      <div class="cats" id="cats"></div>
+      <section class="rule">
+        <h2>쓰기 전에</h2>
+        <ul>
+          <li><b>파일은 내 컴퓨터 밖으로 나가지 않아요.</b> 이 브라우저 안에서만 읽고 만들어요. 메모·설정도 이 브라우저에만 남아요. 같은 PC를 함께 쓰면 메모에 개인정보를 적지 마세요.</li>
+          <li><b>결과는 꼭 확인하고 쓰세요.</b> 한 사람이 현장에서 쓰며 만든 참고용 도구라, 쓰는 책임은 쓰는 사람에게 있어요.</li>
+          <li><b>회사에서 막힐 수 있어요.</b> 우편번호 찾기와 사진 손질방의 AI 배경 지우기는 바깥에서 자료를 받아 와요. 나머지는 이 사이트 안에서 돌아가요.</li>
+          <li><b>내 스타일로 바꿔 쓰세요.</b> 줄인 시간은 동료와 나에게 돌려주세요.</li>
+        </ul>
+        <p class="by">만든 사람 김태균 · <a id="fb" target="_blank" rel="noopener">의견 보내기</a> · 본보기에 나오는 「칼퇴상사」와 사람은 모두 지어낸 것이에요.</p>
+      </section>
+    </section>
+    <section class="work" id="work" hidden>
+      <div class="tabs" id="tabs" role="tablist" aria-label="열어 둔 도구"></div>
+      <div class="frames" id="frames"></div>
+    </section>
+  </main>
+  <aside class="dock" id="dock" aria-label="시계·달력·메모"><div id="dockMini"></div><p class="away" id="away" hidden>작은 창에 띄워 두었어요.<br><button class="act" type="button" id="backBtn">다시 여기에 두기</button></p></aside>
+</div>
+<div class="stamp" id="stamp" role="status" aria-live="polite"></div>
+<script src="tools.js?v=1"></script>
+<script src="mini.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>

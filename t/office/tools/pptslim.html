@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PPT 용량 줄이기 — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+.opts{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
+.big{font-size:1.5rem;font-weight:800}
+.big .arrow{color:var(--muted);font-weight:400;margin:0 8px}
+.big .after{color:var(--ok)}
+table.list{border-collapse:collapse;width:100%;font-size:.86rem}
+table.list th,table.list td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:middle}
+table.list th{color:var(--muted);font-weight:600;font-size:.8rem}
+table.list td.n{text-align:right;white-space:nowrap}
+table.list img{width:64px;height:44px;object-fit:cover;border-radius:4px;display:block;background:var(--soft)}
+table.list tr.skip td{opacity:.5}
+.bar{display:inline-block;height:8px;border-radius:99px;background:var(--ppt);vertical-align:middle}
+.good{color:var(--ok);font-weight:700}
+.prog{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">무거운 PPT는 대개 <b>안에 든 사진 몇 장</b> 때문입니다. 휴대폰 사진 원본(한 장 5~10MB)을 화면에 필요한 크기로 줄여 다시 묶습니다. 글·도형·표·애니메이션·전환 효과는 건드리지 않습니다. <span class="hint">같은 구조인 워드(docx)·엑셀(xlsx)·한글(hwpx)도 됩니다.</span></p>
+  <section class="panel" style="margin-top:12px">
+    <div class="step"><span class="n">1</span><h2>파일 넣기</h2></div>
+    <div class="drop" id="drop">
+      <b>PPT 파일(pptx)을 여기에 끌어다 놓기</b>
+      <div class="hint" style="margin-bottom:8px">docx·xlsx·hwpx도 됩니다 · 옛 형식 ppt·hwp는 프로그램에서 「다른 이름으로 저장 → pptx·hwpx」 뒤에 넣어 주세요</div>
+      <label class="btn"><input type="file" id="file" accept=".pptx,.ppsx,.potx,.docx,.xlsx,.hwpx" hidden>파일 고르기</label>
+      <button type="button" class="btn" id="sample">예시 PPT로 해 보기</button>
+    </div>
+    <p class="info hint" id="info" style="margin:8px 0 0"></p>
+  </section>
+  <section class="panel" id="p2" hidden>
+    <div class="step"><span class="n">2</span><h2>무엇이 무거운지 · 얼마나 줄일지</h2></div>
+    <div class="opts">
+      <label class="f">사진 최대 크기 (긴 쪽)<select id="max"><option value="1920">1920px — 화면 발표용 (권장)</option><option value="1280">1280px — 메일·카톡용 (가장 가볍게)</option><option value="2560">2560px — 인쇄도 할 때</option></select></label>
+      <label class="f">사진 화질<select id="q"><option value="0.82">보통 (권장)</option><option value="0.7">조금 낮게 (더 가볍게)</option><option value="0.9">높게</option></select></label>
+      <label class="chk"><input type="checkbox" id="png2jpg" checked> 투명한 부분 없는 PNG 사진은 JPG로 (PPT·워드·엑셀만)</label>
+      <button type="button" class="btn main" id="go">줄이기</button>
+    </div>
+    <div class="prog" id="prog" hidden><i></i></div>
+    <div class="scroll" style="margin-top:10px"><table class="list" id="list"></table></div>
+    <p class="hint" id="other"></p>
+  </section>
+  <section class="panel" id="p3" hidden>
+    <div class="step"><span class="n">3</span><h2>결과 받기</h2></div>
+    <div class="big" id="res"></div>
+    <div class="row" style="margin-top:10px"><button type="button" class="btn main" id="dl">줄인 파일 받기</button><span class="hint">원래 파일은 그대로 두고, 이름 끝에 「_줄임」을 붙인 새 파일로 받습니다. 받은 파일을 한 번 열어 사진이 괜찮은지 확인해 주세요.</span></div>
+  </section>
+  <section class="panel">
+    <h2>그래도 무거우면</h2>
+    <ul class="hint" style="margin:0;padding-left:18px">
+      <li><b>동영상·소리</b>는 이 도구가 줄이지 못합니다(목록에 따로 표시). 동영상은 PowerPoint 「파일 › 정보 › 미디어 압축」이나 유튜브 링크로 바꾸는 방법이 있습니다.</li>
+      <li><b>잘라 낸(자르기) 사진</b>도 PowerPoint는 원본 전체를 품고 있습니다. PowerPoint에서 사진 하나를 누르고 「그림 서식 › 그림 압축 › 잘린 영역 삭제」를 해 주세요.</li>
+      <li><b>글꼴 포함 저장</b>을 켜 두면 글꼴 파일이 들어가 수십 MB가 됩니다. 「파일 › 옵션 › 저장 › 파일의 글꼴 포함」을 끄면 가벼워집니다.</li>
+    </ul>
+  </section>
+  
+</div>
+<script src="../../../lib/jszip.min.js"></script>
+<script src="../core.js?v=7"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc;
+  O.header('pptslim');
+  var zip = null, file = null, kind = '', items = [], outBlob = null, origSize = 0;
+  var IMG = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png' }, MEDIA_OTHER = /\.(mp4|m4v|mov|wmv|avi|mpe?g|mp3|wav|m4a|wma|ogg)$/i;
+  function ext(n) { return (n.split('.').pop() || '').toLowerCase(); }
+  function isMedia(n) { return /^(ppt|word|xl)\/media\//.test(n) || /^BinData\//.test(n); }
+  function load(f) {
+    file = f; outBlob = null; $('p3').hidden = true; $('info').textContent = '여는 중…';
+    O.readBuf(f).then(function (buf) { origSize = buf.byteLength; return JSZip.loadAsync(buf); }).then(function (z) {
+      zip = z; var names = Object.keys(z.files);
+      kind = names.some(function (n) { return /^ppt\//.test(n); }) ? 'PPT' : names.some(function (n) { return /^word\//.test(n); }) ? '워드' : names.some(function (n) { return /^xl\//.test(n); }) ? '엑셀' : names.indexOf('Contents/content.hpf') >= 0 ? '한글' : '';
+      if (!kind) throw new Error('PPT·워드·엑셀·한글(hwpx) 파일이 아닙니다');
+      items = []; var others = [], fonts = 0;
+      names.forEach(function (n) {
+        var e = z.files[n]; if (e.dir) return; var sz = e._data && e._data.uncompressedSize || 0;
+        if (/\/fonts\//.test(n) || /\.(odttf|fntdata)$/i.test(n)) fonts += sz;
+        if (!isMedia(n)) return;
+        if (IMG[ext(n)]) items.push({ name: n, size: sz, use: true });
+        else if (MEDIA_OTHER.test(n)) others.push(n.split('/').pop() + ' ' + O.fmtSize(sz));
+      });
+      items.sort(function (a, b) { return b.size - a.size; });
+      var imgTotal = items.reduce(function (a, x) { return a + x.size; }, 0);
+      $('info').innerHTML = '<b>' + esc(f.name) + '</b> (' + kind + ') · ' + O.fmtSize(origSize) + ' · 사진 ' + items.length + '장 (풀었을 때 ' + O.fmtSize(imgTotal) + ')';
+      $('other').innerHTML = (others.length ? '🎞️ 줄이지 못하는 동영상·소리: ' + esc(others.join(', ')) + '<br>' : '') + (fonts > 500000 ? '🔤 포함된 글꼴 ' + O.fmtSize(fonts) + ' — 아래 「그래도 무거우면」의 글꼴 포함 끄기를 보세요.' : '');
+      $('p2').hidden = false;
+      return Promise.all(items.map(function (it) { return zip.file(it.name).async('blob').then(function (b) { it.blob = new Blob([b], { type: IMG[ext(it.name)] }); return createImageBitmap(it.blob).then(function (bm) { it.w = bm.width; it.h = bm.height; var cv = document.createElement('canvas'), s = 96 / Math.max(bm.width, bm.height); cv.width = Math.max(1, Math.round(bm.width * s)); cv.height = Math.max(1, Math.round(bm.height * s)); cv.getContext('2d').drawImage(bm, 0, 0, cv.width, cv.height); it.thumb = cv.toDataURL('image/jpeg', .7); bm.close && bm.close(); }).catch(function () { it.bad = true; it.use = false; }); }); }));
+    }).then(function () { list(); }).catch(function (e) { $('info').textContent = '열지 못했습니다: ' + e.message + ' (암호가 걸린 파일은 암호를 푼 뒤 넣어 주세요)'; $('p2').hidden = true; });
+  }
+  function list() {
+    var max = items.length ? items[0].size : 1, h = '<tr><th></th><th>넣기</th><th>사진</th><th>크기(가로×세로)</th><th class="n">용량</th><th></th><th class="n">줄인 뒤</th></tr>';
+    items.forEach(function (it, i) {
+      h += '<tr class="' + (it.use ? '' : 'skip') + '"><td>' + (it.thumb ? '<img src="' + it.thumb + '" alt="">' : '') + '</td><td><input type="checkbox" data-i="' + i + '"' + (it.use ? ' checked' : '') + (it.bad ? ' disabled' : '') + ' aria-label="이 사진 줄이기"></td><td>' + esc(it.name.split('/').pop()) + (it.bad ? ' <span class="hint">(읽지 못함)</span>' : '') + '</td><td>' + (it.w ? it.w + '×' + it.h : '') + '</td><td class="n">' + O.fmtSize(it.size) + '</td><td><span class="bar" style="width:' + Math.max(2, Math.round(it.size / max * 120)) + 'px"></span></td><td class="n">' + (it.out ? (it.out.keep ? '<span class="hint">그대로</span>' : '<span class="good">' + O.fmtSize(it.out.size) + '</span>' + (it.out.newName ? ' <span class="hint">JPG</span>' : '')) : '') + '</td></tr>';
+    });
+    $('list').innerHTML = items.length ? h : '<tr><td class="hint">이 파일에는 줄일 사진이 없습니다.</td></tr>';
+    $('list').querySelectorAll('[data-i]').forEach(function (c) { c.onchange = function () { items[+c.dataset.i].use = c.checked; c.closest('tr').classList.toggle('skip', !c.checked); }; });
+  }
+  function hasAlpha(c, w, h) { var d = c.getImageData(0, 0, w, h).data, step = Math.max(4, Math.floor(d.length / 4 / 400000)) * 4; for (var i = 3; i < d.length; i += step) if (d[i] < 250) return true; return false; }
+  function toBlob(cv, type, q) { return new Promise(function (ok) { cv.toBlob(ok, type, q); }); }
+  function shrink(it, max, q, png2jpg) {
+    var s = Math.min(1, max / Math.max(it.w, it.h)), isPng = ext(it.name) === 'png';
+    return createImageBitmap(it.blob).then(function (bm) {
+      var cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(it.w * s)); cv.height = Math.max(1, Math.round(it.h * s));
+      var c = cv.getContext('2d'); c.imageSmoothingQuality = 'high';
+      var toJpg = !isPng || (png2jpg && kind !== '한글' && !(function () { c.drawImage(bm, 0, 0, cv.width, cv.height); return hasAlpha(c, cv.width, cv.height); })());
+      if (toJpg) { c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height); }
+      else c.clearRect(0, 0, cv.width, cv.height);
+      c.drawImage(bm, 0, 0, cv.width, cv.height); bm.close && bm.close();
+      if (!toJpg && s === 1) return { keep: true };   // 투명 PNG를 줄일 필요 없음
+      return toBlob(cv, toJpg ? 'image/jpeg' : 'image/png', q).then(function (b) {
+        if (!b || b.size >= it.size * .95) return { keep: true };   // 오히려 커지면 원래 것
+        return { blob: b, size: b.size, newName: isPng && toJpg ? it.name.replace(/\.png$/i, '') : null };
+      });
+    });
+  }
+  $('go').onclick = function () {
+    if (!zip) return;
+    var max = +$('max').value, q = +$('q').value, png2jpg = $('png2jpg').checked, todo = items.filter(function (it) { return it.use && !it.bad; }), i = 0, btn = this, bar = $('prog').querySelector('i');
+    items.forEach(function (it) { it.out = null; });
+    btn.disabled = true; $('prog').hidden = false; bar.style.width = '0';
+    (function next() {
+      if (i >= todo.length) { pack().then(function () { btn.disabled = false; setTimeout(function () { $('prog').hidden = true; }, 800); }); return; }
+      var it = todo[i++];
+      shrink(it, max, q, png2jpg).then(function (r) { it.out = r; }).catch(function () { it.out = { keep: true }; }).then(function () { bar.style.width = Math.round(i / todo.length * 90) + '%'; list(); setTimeout(next, 0); });
+    })();
+  };
+  /* 다시 묶기: 바뀐 사진 넣고, PNG→JPG 이름이 바뀐 것은 연결(rels)·형식 목록도 고침 */
+  function pack() {
+    return zip.generateAsync({ type: 'uint8array' }).then(function (raw) { return JSZip.loadAsync(raw); }).then(function (z) {
+      var renames = {}, have = {}; Object.keys(z.files).forEach(function (n) { have[n] = 1; });
+      items.forEach(function (it) {
+        if (!it.out || it.out.keep) return;
+        if (it.out.newName) {
+          var nn = it.out.newName + '.jpeg', k = 2; while (have[nn]) nn = it.out.newName + '_' + (k++) + '.jpeg';
+          z.remove(it.name); z.file(nn, it.out.blob, { createFolders: false }); have[nn] = 1; renames[it.name.split('/').pop()] = nn.split('/').pop();
+        } else z.file(it.name, it.out.blob, { createFolders: false });
+      });
+      var keys = Object.keys(renames), jobs = [];
+      if (keys.length) {
+        Object.keys(z.files).forEach(function (n) {
+          if (!/\.rels$/.test(n) && n !== '[Content_Types].xml') return;
+          jobs.push(z.file(n).async('string').then(function (s) {
+            var t = s; keys.forEach(function (old) { t = t.split('media/' + old + '"').join('media/' + renames[old] + '"'); });
+            if (n === '[Content_Types].xml' && !/Extension="jpeg"/i.test(t)) t = t.replace(/(<Types[^>]*>)/, '$1<Default Extension="jpeg" ContentType="image/jpeg"/>');
+            if (t !== s) z.file(n, t, { createFolders: false });
+          }));
+        });
+      }
+      return Promise.all(jobs).then(function () {
+        /* hwpx는 mimetype이 맨 앞·무압축이어야 한글이 연다 */
+        var opts = { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }, mimeType: 'application/octet-stream' };
+        if (z.files.mimetype) { var mt = z.files.mimetype; return mt.async('string').then(function (m) { var z2 = new JSZip(); z2.file('mimetype', m, { compression: 'STORE', createFolders: false }); var rest = Object.keys(z.files).filter(function (n) { return n !== 'mimetype' && !z.files[n].dir; }); return Promise.all(rest.map(function (n) { return z.files[n].async('uint8array').then(function (d) { return [n, d]; }); })).then(function (all) { all.forEach(function (x) { z2.file(x[0], x[1], { createFolders: false }); }); return z2.generateAsync(opts); }); }); }
+        return z.generateAsync(opts);
+      });
+    }).then(function (blob) {
+      outBlob = blob; $('prog').querySelector('i').style.width = '100%';
+      var pct = Math.round((1 - blob.size / origSize) * 100);
+      $('res').innerHTML = O.fmtSize(origSize) + '<span class="arrow">→</span><span class="after">' + O.fmtSize(blob.size) + '</span> <span class="hint" style="font-size:1rem;font-weight:600">' + (pct > 0 ? pct + '% 줄었습니다' : '더 줄일 사진이 거의 없었습니다') + '</span>';
+      $('p3').hidden = false;
+      if (blob.size > 10 * 1048576) $('res').insertAdjacentHTML('beforeend', '<div class="hint" style="font-size:.9rem;font-weight:400;margin-top:4px">아직 10MB가 넘습니다 — 사진 최대 크기를 1280px로 낮추거나 아래 「그래도 무거우면」을 보세요.</div>');
+    });
+  }
+  $('dl').onclick = function () { if (!outBlob) return; var n = file.name.replace(/(\.[^.]+)$/, '_줄임$1'); O.download(n, outBlob, { pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }[ext(n)]); };
+  /* ---------- 예시 PPT: 원본 크기 가상 사진 4장(JPG 3 + 투명 없는 PNG 1)을 넣은 무거운 발표 ---------- */
+  function heavyImg(w, h, hue, type, q) {
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h; var c = cv.getContext('2d');
+    var g = c.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'hsl(' + hue + ',60%,72%)'); g.addColorStop(1, 'hsl(' + (hue + 40) + ',55%,40%)'); c.fillStyle = g; c.fillRect(0, 0, w, h);
+    for (var i = 0; i < 40; i++) { c.fillStyle = 'hsla(' + (hue + i * 9) + ',70%,' + (40 + i % 30) + '%,.35)'; c.beginPath(); c.arc((i * 997) % w, (i * 613) % h, h * (.04 + (i % 7) * .02), 0, 7); c.fill(); }
+    var d = c.getImageData(0, 0, w, h), a = d.data, s = 12345;
+    for (var j = 0; j < a.length; j += 4) { s = (s * 1103515245 + 12345) & 0x7fffffff; var v = (s >> 16) % 36 - 18; a[j] += v; a[j + 1] += v; a[j + 2] += v; }
+    c.putImageData(d, 0, 0);
+    c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, h * .86, w, h * .14); c.fillStyle = '#fff'; c.font = '700 ' + Math.round(h * .06) + 'px Pretendard, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('휴대폰 원본 크기 사진 ' + w + '×' + h + ' (예시 그림)', w / 2, h * .93);
+    return cv.toDataURL(type, q);
+  }
+  function needPptx() {
+    return window.PptxGenJS ? Promise.resolve() : new Promise(function (ok, no) {
+      var sc = document.createElement('script'); sc.src = '../../../lib/pptxgen.bundle.js';
+      sc.onload = ok; sc.onerror = function () { no(new Error('net')); }; document.head.appendChild(sc);
+    });
+  }
+  $('sample').onclick = function () {
+    var btn = this; btn.disabled = true; $('info').textContent = '예시 PPT 만드는 중… (원본 크기 사진이라 몇 초 걸립니다)';
+    needPptx().then(function () {
+      var p = new PptxGenJS(); p.layout = 'LAYOUT_WIDE';
+      var t = p.addSlide(); t.background = { color: 'F4F7FB' };
+      t.addText('2026 사업 보고 (예시)', { x: .8, y: 2.4, w: 11.7, h: 1.2, fontSize: 40, bold: true, color: '1F3B63', align: 'center', fontFace: '맑은 고딕' });
+      t.addText('사진이 무거워 메일로 못 보내는 발표 — 줄이기 시험용', { x: .8, y: 3.7, w: 11.7, h: .6, fontSize: 18, color: '555555', align: 'center', fontFace: '맑은 고딕' });
+      [['봄 나들이', 200, 'image/jpeg'], ['프로그램 활동 모습', 20, 'image/jpeg'], ['연말 행사', 280, 'image/jpeg'], ['단체 사진 (PNG로 붙여 넣은 것)', 140, 'image/png']].forEach(function (x) {
+        var s = p.addSlide(); s.addText(x[0], { x: .5, y: .25, w: 12.3, h: .7, fontSize: 26, bold: true, color: '1F3B63', fontFace: '맑은 고딕' });
+        var png = x[2] === 'image/png', w = png ? 2400 : 4000, h = png ? 1800 : 3000;
+        s.addImage({ data: heavyImg(w, h, x[1], x[2], .97), x: 1.67, y: 1.1, w: 10, h: 6 });
+      });
+      return p.write({ outputType: 'blob' });
+    }).then(function (blob) {
+      btn.disabled = false;
+      load(new File([blob], '무거운 발표(예시).pptx', { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
+    }).catch(function () { btn.disabled = false; $('info').textContent = ''; O.toast('예시를 만들지 못했습니다. 인터넷 연결을 확인해 주세요.'); });
+  };
+  O.bindDrop($('drop'), $('file'), function (fs) { var f = fs.filter(function (x) { return /\.(pptx|ppsx|potx|docx|xlsx|hwpx)$/i.test(x.name); })[0]; if (!f) { O.toast(fs.some(function (x) { return /\.(ppt|hwp|doc|xls)$/i.test(x.name); }) ? '옛 형식(ppt·hwp·doc·xls)은 프로그램에서 새 형식으로 저장한 뒤 넣어 주세요.' : 'pptx·docx·xlsx·hwpx 파일을 넣어 주세요.'); return; } load(f); });
+  window._slim = { load: load };
+})();
+</script>
+</body>
+</html>

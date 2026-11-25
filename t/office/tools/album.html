@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사진 앨범 PPT — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+.lay{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:14px;align-items:start}
+.opts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px}
+.opts .w2{grid-column:1/-1}
+.lays{display:flex;gap:6px;flex-wrap:wrap}
+.lays button{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.8rem;min-width:62px}
+.lays button.on{border-color:var(--blue);background:var(--soft)}
+.lays svg{width:46px;height:26px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;max-height:430px;overflow:auto;padding:2px}
+.th{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--soft)}
+.th img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.th small{display:block;font-size:.72rem;padding:2px 5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.th .x{position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:.8rem;line-height:1}
+.th .no{position:absolute;top:3px;left:3px;background:rgba(0,0,0,.6);color:#fff;font-size:.7rem;border-radius:6px;padding:0 5px}
+.th.folder{grid-column:1/-1;border:0;background:none;font-weight:700;font-size:.9rem;padding:4px 2px 0}
+.slides{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px}
+.slides canvas{width:100%;border:1px solid var(--line);border-radius:6px;display:block}
+.slides small{color:var(--muted);font-size:.75rem}
+.prog{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+@media (max-width:860px){.lay{grid-template-columns:minmax(0,1fr)}}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">사진 폴더를 통째로 넣으면 <b>찍은 순서대로</b> 정리해 한 장에 1~9장씩 배치한 PowerPoint 파일을 만듭니다. 사진은 화면에 맞는 크기로 줄여 넣어 파일이 가볍습니다. 결과 PPT에서 글·사진은 자유롭게 고칠 수 있습니다.</p>
+  <div class="lay" style="margin-top:12px">
+    <div>
+      <section class="panel">
+        <div class="step"><span class="n">1</span><h2>사진 넣기</h2></div>
+        <div class="drop" id="drop">
+          <b>사진이나 사진 폴더를 여기에 끌어다 놓기</b>
+          <div class="hint" style="margin-bottom:8px">JPG·PNG·WEBP · 폴더 안에 폴더가 있으면 폴더마다 간지(구분 장)를 넣을 수 있습니다</div>
+          <label class="btn"><input type="file" id="file" accept="image/jpeg,image/png,image/webp" multiple hidden>사진 고르기</label>
+          <label class="btn"><input type="file" id="dir" webkitdirectory hidden>폴더 고르기</label>
+          <button type="button" class="btn" id="sample">예시 사진으로 해 보기</button>
+        </div>
+        <p class="hint" id="cnt" style="margin:8px 0 0">아이폰 HEIC 사진은 브라우저가 못 읽습니다 — 휴대폰 설정에서 「호환성 우선」으로 찍거나 JPG로 바꿔 넣어 주세요.</p>
+      </section>
+      <section class="panel">
+        <div class="step"><span class="n">2</span><h2>앨범 모양</h2></div>
+        <div class="opts">
+          <div class="w2"><div class="hint" style="margin-bottom:4px">한 장에 사진</div><div class="lays" id="lays"></div></div>
+          <label class="f w2">앨범 제목 (첫 장)<input type="text" id="title" placeholder="예: 2026 가을 한마당 사진"></label>
+          <label class="f w2">제목 아래 한 줄<input type="text" id="sub" placeholder="예: 2026. 11. 3. · 본관 강당 · 칼퇴상사"></label>
+          <label class="f">사진 순서<select id="order"><option value="time">찍은 시각 순</option><option value="name">파일 이름 순</option><option value="added">넣은 순서</option></select></label>
+          <label class="f">사진 아래 글<select id="cap"><option value="">없음</option><option value="name">파일 이름</option><option value="time">찍은 날짜·시각</option></select></label>
+          <label class="f">사진 맞추기<select id="fit"><option value="cover">칸에 꽉 채우기 (가장자리 잘림)</option><option value="contain">사진 전체 보이기 (여백)</option></select></label>
+          <label class="f">화면 비율<select id="ratio"><option value="16:9">16:9 (요즘 PPT)</option><option value="4:3">4:3</option></select></label>
+          <label class="f">바탕<select id="theme"><option value="white">흰색</option><option value="ivory">아이보리</option><option value="gray">연한 회색</option><option value="navy">남색</option><option value="black">검정</option></select></label>
+          <label class="f">사진 화질<select id="q"><option value="1600">보통 (가볍게, 권장)</option><option value="2400">높게 (인쇄용)</option><option value="1200">가장 가볍게 (메일용)</option></select></label>
+          <label class="chk w2"><input type="checkbox" id="slideTitle" checked> 장마다 위에 작은 제목 (폴더 이름, 없으면 앨범 제목)</label>
+          <label class="chk w2"><input type="checkbox" id="folderDiv" checked> 폴더가 여럿이면 폴더마다 간지 넣기</label>
+          <label class="chk w2"><input type="checkbox" id="end"> 마지막에 「감사합니다」 장</label>
+        </div>
+      </section>
+    </div>
+    <div>
+      <section class="panel">
+        <div class="step"><span class="n">3</span><h2>사진 확인</h2><span class="hint" id="sum"></span></div>
+        <div class="thumbs" id="thumbs"><p class="hint">사진을 넣으면 여기에 순서대로 보입니다. 빼고 싶은 사진은 ✕.</p></div>
+      </section>
+      <section class="panel">
+        <div class="step"><span class="n">4</span><h2>미리 보기 · 받기</h2></div>
+        <div class="row"><button type="button" class="btn main" id="make" disabled>PPT 파일 받기</button><span class="hint" id="est"></span></div>
+        <div class="prog" id="prog" hidden><i></i></div>
+        <div class="slides" id="slides"></div>
+      </section>
+    </div>
+  </div>
+  
+</div>
+<script src="../../../lib/pptxgen.bundle.js"></script>
+<script src="../core.js?v=7"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc;
+  O.header('album');
+  var photos = [], seq = 0, per = 4;
+  var THEMES = { white: { bg: 'FFFFFF', fg: '1A2B50', sub: '5B6885', line: 'D5DDEC' }, ivory: { bg: 'FAF6EC', fg: '3B3122', sub: '7A6A50', line: 'E3D8BF' }, gray: { bg: 'F1F3F6', fg: '1F2937', sub: '6B7280', line: 'D1D5DB' }, navy: { bg: '14213D', fg: 'FFFFFF', sub: 'B8C4E0', line: '2F3F73' }, black: { bg: '111111', fg: 'FFFFFF', sub: 'AAAAAA', line: '333333' } };
+  var LAYS = [1, 2, 3, 4, 6, 9];
+
+  /* ---------- 찍은 시각 (EXIF DateTimeOriginal) ---------- */
+  function exifTime(buf) {
+    var v = new DataView(buf); if (v.byteLength < 4 || v.getUint16(0) !== 0xFFD8) return null;
+    var off = 2;
+    while (off + 4 < v.byteLength) {
+      var mk = v.getUint16(off), len = v.getUint16(off + 2);
+      if (mk === 0xFFE1 && v.getUint32(off + 4) === 0x45786966) {
+        var t = off + 10, le = v.getUint16(t) === 0x4949;
+        var u16 = function (p) { return v.getUint16(t + p, le); }, u32 = function (p) { return v.getUint32(t + p, le); };
+        var find = function (ifd, tag) { var n = u16(ifd); for (var i = 0; i < n; i++) { var e = ifd + 2 + i * 12; if (u16(e) === tag) return e; } return 0; };
+        var ifd0 = u32(4), ex = find(ifd0, 0x8769), dt = 0, str = function (e) { var c = u32(e + 4), p = c > 4 ? u32(e + 8) : e + 8, s = ''; for (var i = 0; i < c - 1; i++) s += String.fromCharCode(v.getUint8(t + p + i)); return s; };
+        if (ex) { var sub = u32(ex + 8); dt = find(sub, 0x9003) || find(sub, 0x9004); }
+        if (!dt) dt = find(ifd0, 0x0132);
+        if (!dt) return null;
+        var m = str(dt).match(/(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);
+        return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +m[6]).getTime() : null;
+      }
+      if ((mk & 0xFF00) !== 0xFF00) break; off += 2 + len;
+    }
+    return null;
+  }
+  function fmtTime(ms) { var d = new Date(ms); return d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + '. ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  function fmtDay(ms) { var d = new Date(ms); return d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + '.'; }
+
+  /* ---------- 사진 넣기 ---------- */
+  function addFiles(files) {
+    var imgs = files.filter(function (f) { return /^image\/(jpeg|png|webp)$/.test(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name); });
+    var heic = files.filter(function (f) { return /\.(heic|heif)$/i.test(f.name); }).length;
+    if (!imgs.length) { O.toast(heic ? 'HEIC 사진은 읽지 못합니다. JPG로 바꿔 넣어 주세요.' : '사진(JPG·PNG·WEBP)을 넣어 주세요.'); return; }
+    var have = {}; photos.forEach(function (p) { have[p.key] = 1; });
+    var todo = imgs.filter(function (f) { var k = (f.relPath || f.webkitRelativePath || f.name) + '|' + f.size; return !have[k]; });
+    var dup = imgs.length - todo.length;
+    $('cnt').textContent = '사진 읽는 중… (' + todo.length + '장)';
+    var i = 0;
+    (function next() {
+      if (i >= todo.length) { $('cnt').textContent = '사진 ' + photos.length + '장' + (dup ? ' · 같은 사진 ' + dup + '장은 한 번만' : '') + (heic ? ' · HEIC ' + heic + '장은 못 읽음' : ''); autoText(); refresh(); return; }
+      var f = todo[i++], path = f.relPath || f.webkitRelativePath || '', parts = path.split('/'); parts.pop();
+      var folder = parts.length ? parts[parts.length - 1] : '';
+      f.slice(0, 196608).arrayBuffer().then(function (b) {
+        var t = null; try { t = exifTime(b); } catch (e) { }
+        return createImageBitmap(f).then(function (bm) {
+          var cv = document.createElement('canvas'), s = 240 / Math.max(bm.width, bm.height); cv.width = Math.round(bm.width * s); cv.height = Math.round(bm.height * s);
+          cv.getContext('2d').drawImage(bm, 0, 0, cv.width, cv.height);
+          photos.push({ id: ++seq, key: (path || f.name) + '|' + f.size, file: f, name: f.name.replace(/\.[^.]+$/, ''), folder: folder, time: t || f.lastModified, exif: !!t, w: bm.width, h: bm.height, thumb: cv, url: cv.toDataURL('image/jpeg', .8) });
+          bm.close && bm.close();
+        });
+      }).catch(function () { }).then(next);
+    })();
+  }
+  function sorted() {
+    var o = $('order').value, a = photos.slice();
+    if (o === 'time') a.sort(function (x, y) { return (x.folder < y.folder ? -1 : x.folder > y.folder ? 1 : 0) || x.time - y.time || x.name.localeCompare(y.name, 'ko', { numeric: true }); });
+    else if (o === 'name') a.sort(function (x, y) { return (x.folder < y.folder ? -1 : x.folder > y.folder ? 1 : 0) || x.name.localeCompare(y.name, 'ko', { numeric: true }); });
+    else a.sort(function (x, y) { return x.id - y.id; });
+    return a;
+  }
+  function folders(list) { var f = []; list.forEach(function (p) { if (f.indexOf(p.folder) < 0) f.push(p.folder); }); return f; }
+  function autoText() {
+    if (!photos.length) return;
+    var fs = folders(photos), ts = photos.filter(function (p) { return p.exif; }).map(function (p) { return p.time; });
+    if (!$('title').value && fs.length === 1 && fs[0]) $('title').placeholder = fs[0];
+    if (!$('sub').value && ts.length) { var a = Math.min.apply(null, ts), b = Math.max.apply(null, ts); $('sub').placeholder = fmtDay(a) === fmtDay(b) ? fmtDay(a) : fmtDay(a) + ' ~ ' + fmtDay(b); }
+  }
+  function refresh() {
+    var list = sorted(), h = '', cur = null, multi = folders(list).length > 1;
+    list.forEach(function (p, i) {
+      if (multi && p.folder !== cur) { cur = p.folder; h += '<div class="th folder">📁 ' + esc(p.folder || '(맨 위)') + '</div>'; }
+      h += '<div class="th"><img src="' + p.url + '" alt=""><span class="no">' + (i + 1) + '</span><button type="button" class="x" data-del="' + p.id + '" aria-label="이 사진 빼기">✕</button><small title="' + esc(p.name) + '">' + (p.exif ? fmtTime(p.time).slice(-5) + ' · ' : '') + esc(p.name) + '</small></div>';
+    });
+    $('thumbs').innerHTML = h || '<p class="hint">사진을 넣으면 여기에 순서대로 보입니다. 빼고 싶은 사진은 ✕.</p>';
+    $('thumbs').querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { photos = photos.filter(function (p) { return p.id !== +b.dataset.del; }); refresh(); }; });
+    $('sum').textContent = list.length ? list.length + '장' : '';
+    $('make').disabled = !list.length;
+    preview();
+  }
+
+  /* ---------- 장 나누기·배치 (미리 보기와 PPT가 같은 계산을 씀) ---------- */
+  function plan() {
+    var list = sorted(), o = { title: $('title').value.trim() || $('title').placeholder.replace(/^예:.*/, '') || '사진 앨범', sub: $('sub').value.trim() || ($('sub').placeholder.indexOf('예:') === 0 ? '' : $('sub').placeholder), cap: $('cap').value, fit: $('fit').value, ratio: $('ratio').value, th: THEMES[$('theme').value], slideTitle: $('slideTitle').checked, folderDiv: $('folderDiv').checked, end: $('end').checked, q: +$('q').value };
+    o.W = o.ratio === '4:3' ? 10 : 13.333; o.H = 7.5;
+    var slides = [{ kind: 'cover' }], fs = folders(list), multi = fs.length > 1;
+    fs.forEach(function (f) {
+      var ps = list.filter(function (p) { return p.folder === f; });
+      if (multi && o.folderDiv) slides.push({ kind: 'div', text: f || '사진', n: ps.length });
+      for (var i = 0; i < ps.length; i += per) slides.push({ kind: 'photos', head: o.slideTitle ? (multi && f ? f : o.title) : '', ps: ps.slice(i, i + per) });
+    });
+    if (o.end) slides.push({ kind: 'end' });
+    return { o: o, slides: slides };
+  }
+  function grid(n) { return { 1: [1, 1], 2: [2, 1], 3: [3, 1], 4: [2, 2], 6: [3, 2], 9: [3, 3] }[n] || [2, 2]; }
+  function boxes(o, s) {
+    var top = s.head ? 0.95 : 0.4, mx = 0.4, gap = 0.18, capH = o.cap ? 0.34 : 0, g = grid(per), cols = g[0], rows = g[1];
+    var bw = (o.W - mx * 2 - gap * (cols - 1)) / cols, bh = (o.H - top - 0.35 - gap * (rows - 1)) / rows - capH;
+    var n = s.ps.length, usedRows = Math.ceil(n / cols), oy = (rows - usedRows) * (bh + capH + gap) / 2;   // 사진이 모자란 마지막 장은 가운데로
+    return s.ps.map(function (p, i) { var c = i % cols, r = Math.floor(i / cols), inRow = Math.min(cols, n - r * cols), ox = (cols - inRow) * (bw + gap) / 2; return { p: p, x: mx + ox + c * (bw + gap), y: top + oy + r * (bh + capH + gap), w: bw, h: bh, capH: capH }; });
+  }
+  function capText(o, p) { return o.cap === 'name' ? p.name : o.cap === 'time' ? (p.exif ? fmtTime(p.time) : '') : ''; }
+  /* 칸에 맞춰 자른/줄인 그림 영역: cover = 원본에서 잘라낼 부분, contain = 칸 안 자리 */
+  function fitRect(b, pw, ph, fit) {
+    var ba = b.w / b.h, pa = pw / ph;
+    if (fit === 'cover') { var sw = pw, sh = ph, sx = 0, sy = 0; if (pa > ba) { sw = ph * ba; sx = (pw - sw) / 2; } else { sh = pw / ba; sy = (ph - sh) / 2; } return { sx: sx, sy: sy, sw: sw, sh: sh, x: b.x, y: b.y, w: b.w, h: b.h }; }
+    var w = b.w, h = b.h; if (pa > ba) h = w / pa; else w = h * pa; return { sx: 0, sy: 0, sw: pw, sh: ph, x: b.x + (b.w - w) / 2, y: b.y + (b.h - h) / 2, w: w, h: h };
+  }
+  /* ---------- 미리 보기 (앞 12장) ---------- */
+  function preview() {
+    var pl = plan(), o = pl.o, el = $('slides'); el.innerHTML = '';
+    if (!photos.length) { $('est').textContent = ''; return; }
+    $('est').textContent = '모두 ' + pl.slides.length + '장 · 예상 크기 약 ' + O.fmtSize(photos.length * (o.q >= 2400 ? 900000 : o.q >= 1600 ? 420000 : 230000) / (per > 2 ? 1.6 : 1));
+    pl.slides.slice(0, 12).forEach(function (s, i) {
+      var cv = document.createElement('canvas'), k = 300 / o.W; cv.width = 300; cv.height = Math.round(o.H * k);
+      var c = cv.getContext('2d'), th = o.th; c.fillStyle = '#' + th.bg; c.fillRect(0, 0, cv.width, cv.height);
+      c.fillStyle = '#' + th.fg; c.textAlign = 'center'; c.textBaseline = 'middle';
+      if (s.kind === 'cover' || s.kind === 'div' || s.kind === 'end') {
+        var t = s.kind === 'cover' ? o.title : s.kind === 'div' ? s.text : '감사합니다';
+        if (s.kind === 'cover') { var cp = sorted()[0]; if (cp) { var r = fitRect({ x: 0, y: 0, w: cv.width, h: cv.height * .62 }, cp.thumb.width, cp.thumb.height, 'cover'); c.drawImage(cp.thumb, r.sx, r.sy, r.sw, r.sh, r.x, r.y, r.w, r.h); } c.font = 'bold 17px Pretendard, sans-serif'; c.fillText(t, cv.width / 2, cv.height * .76, cv.width - 20); c.fillStyle = '#' + th.sub; c.font = '10px Pretendard, sans-serif'; c.fillText(o.sub, cv.width / 2, cv.height * .88, cv.width - 20); }
+        else { c.font = 'bold 20px Pretendard, sans-serif'; c.fillText(t, cv.width / 2, cv.height / 2, cv.width - 20); if (s.n) { c.fillStyle = '#' + th.sub; c.font = '10px Pretendard, sans-serif'; c.fillText('사진 ' + s.n + '장', cv.width / 2, cv.height / 2 + 20); } }
+      } else {
+        if (s.head) { c.textAlign = 'left'; c.font = 'bold 11px Pretendard, sans-serif'; c.fillText(s.head, .4 * k, .5 * k, cv.width - 30); c.fillStyle = '#' + th.line; c.fillRect(.4 * k, .78 * k, cv.width - .8 * k, 1); }
+        boxes(o, s).forEach(function (b) {
+          var r = fitRect(b, b.p.thumb.width, b.p.thumb.height, o.fit);
+          c.drawImage(b.p.thumb, r.sx, r.sy, r.sw, r.sh, r.x * k, r.y * k, r.w * k, r.h * k);
+          var ct = capText(o, b.p); if (ct) { c.fillStyle = '#' + th.sub; c.textAlign = 'center'; c.font = '8px Pretendard, sans-serif'; c.fillText(ct, (b.x + b.w / 2) * k, (b.y + b.h + b.capH / 2) * k, b.w * k); }
+        });
+      }
+      var d = document.createElement('div'); d.appendChild(cv); d.insertAdjacentHTML('beforeend', '<small>' + (i + 1) + '장</small>'); el.appendChild(d);
+    });
+    if (pl.slides.length > 12) el.insertAdjacentHTML('beforeend', '<p class="hint" style="align-self:center">… 뒤 ' + (pl.slides.length - 12) + '장은 받은 파일에서</p>');
+  }
+  /* ---------- PPT 만들기 ---------- */
+  function cut(p, r, maxPx) {
+    return createImageBitmap(p.file).then(function (bm) {
+      var sx = r.sx / p.thumb.width * bm.width, sy = r.sy / p.thumb.height * bm.height, sw = r.sw / p.thumb.width * bm.width, sh = r.sh / p.thumb.height * bm.height;
+      var s = Math.min(1, maxPx / Math.max(sw, sh)), cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(sw * s)); cv.height = Math.max(1, Math.round(sh * s));
+      var c = cv.getContext('2d'); c.imageSmoothingQuality = 'high'; c.drawImage(bm, sx, sy, sw, sh, 0, 0, cv.width, cv.height); bm.close && bm.close();
+      return cv.toDataURL('image/jpeg', .85);
+    });
+  }
+  $('make').onclick = function () {
+    var pl = plan(), o = pl.o, th = o.th, btn = this, prog = $('prog'), bar = prog.querySelector('i');
+    var pptx = new PptxGenJS(); pptx.layout = o.ratio === '4:3' ? 'LAYOUT_4x3' : 'LAYOUT_WIDE'; pptx.title = o.title;
+    pptx.theme = { headFontFace: '맑은 고딕', bodyFontFace: '맑은 고딕' };
+    var total = photos.length + 1, done = 0, font = '맑은 고딕';
+    btn.disabled = true; prog.hidden = false; bar.style.width = '0';
+    var maxPx = function (b) { return Math.min(o.q, Math.round(o.q * Math.max(b.w / o.W, b.h / o.H) * 1.15) + 200); };
+    var chain = Promise.resolve();
+    pl.slides.forEach(function (s) {
+      chain = chain.then(function () {
+        var sl = pptx.addSlide(); sl.background = { color: th.bg };
+        if (s.kind === 'cover') {
+          var cp = sorted()[0];
+          var p0 = cp ? cut(cp, fitRect({ x: 0, y: 0, w: o.W, h: o.H * .62 }, cp.thumb.width, cp.thumb.height, 'cover'), o.q).then(function (d) { sl.addImage({ data: d, x: 0, y: 0, w: o.W, h: o.H * .62 }); }) : Promise.resolve();
+          return p0.then(function () {
+            sl.addText(o.title, { x: .5, y: o.H * .66, w: o.W - 1, h: 1.1, fontFace: font, fontSize: 36, bold: true, color: th.fg, align: 'center', valign: 'middle', fit: 'shrink' });
+            if (o.sub) sl.addText(o.sub, { x: .5, y: o.H * .66 + 1.1, w: o.W - 1, h: .6, fontFace: font, fontSize: 18, color: th.sub, align: 'center', valign: 'middle' });
+          });
+        }
+        if (s.kind === 'div' || s.kind === 'end') {
+          sl.addText(s.kind === 'end' ? '감사합니다' : s.text, { x: .5, y: o.H / 2 - .8, w: o.W - 1, h: 1.2, fontFace: font, fontSize: 40, bold: true, color: th.fg, align: 'center', valign: 'middle', fit: 'shrink' });
+          if (s.n) sl.addText('사진 ' + s.n + '장', { x: .5, y: o.H / 2 + .4, w: o.W - 1, h: .5, fontFace: font, fontSize: 16, color: th.sub, align: 'center' });
+          return;
+        }
+        if (s.head) { sl.addText(s.head, { x: .4, y: .2, w: o.W - .8, h: .55, fontFace: font, fontSize: 18, bold: true, color: th.fg, valign: 'middle' }); sl.addShape(pptx.ShapeType.line, { x: .4, y: .78, w: o.W - .8, h: 0, line: { color: th.line, width: 1 } }); }
+        var bs = boxes(o, s), q2 = Promise.resolve();
+        bs.forEach(function (b) {
+          q2 = q2.then(function () {
+            var r = fitRect(b, b.p.thumb.width, b.p.thumb.height, o.fit);
+            return cut(b.p, r, maxPx(b)).then(function (d) {
+              sl.addImage({ data: d, x: r.x, y: r.y, w: r.w, h: r.h, altText: b.p.name });
+              var ct = capText(o, b.p); if (ct) sl.addText(ct, { x: b.x, y: b.y + b.h, w: b.w, h: b.capH, fontFace: font, fontSize: per >= 6 ? 10 : 12, color: th.sub, align: 'center', valign: 'middle', fit: 'shrink' });
+              done++; bar.style.width = Math.round(done / total * 100) + '%';
+            });
+          });
+        });
+        return q2;
+      });
+    });
+    chain.then(function () { return pptx.write({ outputType: 'blob', compression: true }); }).then(function (blob) {
+      bar.style.width = '100%'; var name = (o.title || '사진 앨범').replace(/[\\/:*?"<>|]/g, '').slice(0, 60) + '.pptx';
+      O.download(name, blob); O.toast('PPT를 내려받았습니다 (' + O.fmtSize(blob.size) + ').');
+    }).catch(function (e) { O.toast('만들다가 문제가 생겼습니다: ' + e.message, 5000); }).then(function () { btn.disabled = false; setTimeout(function () { prog.hidden = true; }, 1200); });
+  };
+  /* ---------- 연결 ---------- */
+  $('lays').innerHTML = LAYS.map(function (n) {
+    var g = grid(n), cw = 44 / g[0], ch = 24 / g[1], r = '';
+    for (var i = 0; i < n; i++) r += '<rect x="' + (1 + (i % g[0]) * cw + 1) + '" y="' + (1 + Math.floor(i / g[0]) * ch + 1) + '" width="' + (cw - 2) + '" height="' + (ch - 2) + '" rx="1.5" fill="currentColor" opacity=".55"/>';
+    return '<button type="button" data-n="' + n + '"' + (n === per ? ' class="on"' : '') + '><svg viewBox="0 0 46 26"><rect x=".5" y=".5" width="45" height="25" rx="2" fill="none" stroke="currentColor"/>' + r + '</svg>' + n + '장</button>';
+  }).join('');
+  $('lays').querySelectorAll('button').forEach(function (b) { b.onclick = function () { per = +b.dataset.n; $('lays').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); preview(); }; });
+  /* ---------- 예시 사진 (가상 그림, 폴더 3개 9장) ---------- */
+  function sampleShot(w, h, pal, label, k) {
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h; var c = cv.getContext('2d');
+    var g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, pal[0]); g.addColorStop(1, pal[1]); c.fillStyle = g; c.fillRect(0, 0, w, h);
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.beginPath(); c.arc(w * (.18 + k * .07), h * .2, h * .08, 0, 7); c.fill();
+    c.fillStyle = pal[2]; c.beginPath(); c.moveTo(0, h * .72); c.quadraticCurveTo(w * .3, h * (.55 + k * .02), w * .6, h * .7); c.quadraticCurveTo(w * .85, h * .8, w, h * .66); c.lineTo(w, h); c.lineTo(0, h); c.fill();
+    var n = 3 + (k % 4);
+    for (var i = 0; i < n; i++) {
+      var x = w * (.2 + .6 * (i + .5) / n), y = h * .62, r = h * .05;
+      c.fillStyle = ['#F2C14E', '#F78154', '#4D9DE0', '#7CB518', '#E15554', '#9B5DE5'][(i + k) % 6];
+      c.beginPath(); c.ellipse(x, y + r * 2.4, r * 1.1, r * 1.9, 0, 0, 7); c.fill();
+      c.fillStyle = '#F5D6BA'; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill();
+    }
+    c.fillStyle = 'rgba(0,0,0,.45)'; c.fillRect(0, h - h * .11, w, h * .11);
+    c.fillStyle = '#fff'; c.font = '700 ' + Math.round(h * .05) + 'px Pretendard, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(label + ' (예시 그림)', w / 2, h - h * .055);
+    return new Promise(function (ok) { cv.toBlob(ok, 'image/jpeg', .85); });
+  }
+  $('sample').onclick = function () {
+    var SETS = [['1부 개회식', ['#9AD1F5', '#E8F6FF', '#7BBF6A'], ['개회 선언', '내빈 인사', '단체 사진']],
+                ['2부 체험 부스', ['#FFD6A5', '#FFF4E0', '#E0A458'], ['비누 만들기', '커피 시음', '네일 체험', '사진 부스']],
+                ['3부 시상식', ['#C8B6FF', '#F1EAFF', '#8E7DBE'], ['우수 사원', '감사패 전달']]];
+    var base = new Date(2026, 9, 21, 10, 0).getTime(), jobs = [], k = 0;
+    SETS.forEach(function (st) {
+      st[2].forEach(function (lb) {
+        var kk = k++, port = kk === 4;
+        jobs.push(sampleShot(port ? 900 : 1600, 1200, st[1], lb, kk).then(function (b) {
+          var f = new File([b], '예시_' + String(kk + 1).padStart(2, '0') + '_' + lb + '.jpg', { type: 'image/jpeg', lastModified: base + kk * 1500000 });
+          f.relPath = '2026 가을 한마당(예시)/' + st[0] + '/' + f.name; return f;
+        }));
+      });
+    });
+    Promise.all(jobs).then(function (fs) {
+      if (!$('title').value) $('title').value = '2026 가을 한마당 사진 (예시)';
+      if (!$('sub').value) $('sub').value = '2026. 10. 21. · 본관 강당 · 칼퇴상사';
+      addFiles(fs);
+    });
+  };
+  O.bindDrop($('drop'), $('file'), addFiles);
+  $('dir').addEventListener('change', function () { addFiles([].slice.call(this.files)); this.value = ''; });
+  ['title', 'sub'].forEach(function (id) { $(id).addEventListener('input', preview); });
+  ['cap', 'fit', 'ratio', 'theme', 'q', 'slideTitle', 'folderDiv', 'end'].forEach(function (id) { $(id).addEventListener('change', preview); });
+  $('order').addEventListener('change', refresh);
+  window._album = { addFiles: addFiles, plan: plan, photos: function () { return photos; } };
+})();
+</script>
+</body>
+</html>

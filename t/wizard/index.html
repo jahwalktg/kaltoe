@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문서 변신 마법사 — 재료를 모아 내 양식에 담기</title>
+<link rel="icon" type="image/png" href="favicon.png">
+
+
+<link rel="stylesheet" href="style.css?v=1">
+<style>
+.hero{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:6px 0 4px}
+.hero h1{margin:0;font-size:1.5rem}
+.badge{font-size:.78rem;padding:2px 9px;border-radius:99px;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);font-weight:600}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 14px;font-size:.9rem}
+.flow span{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px 10px}
+.flow i{color:var(--muted);font-style:normal}
+.card{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;background:var(--surface)}
+.card.bad{border-color:var(--red);background:color-mix(in srgb,var(--red) 6%,var(--surface))}
+.card.warn{border-color:var(--amber-line)}
+.card h3{margin:0;font-size:1rem;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.card h3 small{font-weight:400;color:var(--muted);font-size:.82rem}
+.mini{font-size:.8rem;padding:3px 9px;min-height:28px}
+table.list{border-collapse:collapse;width:100%;font-size:.86rem;margin-top:8px}
+table.list th,table.list td{border-bottom:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:middle}
+table.list th{color:var(--muted);font-weight:600;font-size:.8rem;white-space:nowrap}
+table.list select{max-width:210px;padding:4px 6px}
+table.list td.ex{color:var(--muted);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr.ask td{background:var(--amber-bg)}
+tr.skip td{opacity:.55}
+.st{display:inline-block;font-size:.78rem;padding:1px 8px;border-radius:99px;white-space:nowrap;font-weight:600}
+.st.sure{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.st.ask{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line)}
+.st.new{background:var(--soft);color:var(--muted);border:1px dashed var(--line)}
+.st.no{background:transparent;color:var(--muted)}
+.st.done{background:var(--soft);color:var(--blue)}
+.why{font-size:.8rem;color:var(--amber)}
+.fix{margin:6px 0 0;font-size:.88rem}
+.fix a{font-weight:600}
+.sum{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 8px}
+.pill{font-size:.86rem;padding:3px 11px;border-radius:99px;background:var(--soft);border:1px solid var(--line)}
+.pill.todo{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber);font-weight:700}
+.pill.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);border-color:transparent;color:var(--ok);font-weight:700}
+ul.issues{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:6px}
+ul.issues li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;border:1px solid var(--amber-line);background:var(--amber-bg);border-radius:10px;padding:7px 10px;font-size:.88rem}
+ul.issues li.block{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--surface))}
+ul.issues li.done{border-color:var(--line);background:var(--surface);color:var(--muted)}
+ul.issues li .t{flex:1;min-width:220px}
+.pv{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.pv table{border-collapse:collapse;font-size:.82rem;background:#fff;color:#111;white-space:nowrap;min-width:100%}
+.pv th,.pv td{border:1px solid #bbb;padding:3px 7px}
+.pv th{background:#e7e6e6;position:sticky;top:0;z-index:1}
+.pv td.none{color:#aaa;background:#fafafa}
+.pv td.cf{background:#ffe9a8}
+.pv td select{max-width:210px;font-size:.8rem;background:#fff;color:#111;border:1px solid #999;border-radius:6px;padding:2px 4px}
+.pv td.cf select{border:2px solid #C98A00}
+.pv td.picked{background:#eaf6ee}
+.pv td.edited{background:#e8f0ff}
+.pv td[contenteditable]:focus{outline:2px solid #1A6EFF;background:#fff}
+.pv tr.off td{opacity:.4;text-decoration:line-through}
+.pv tr.flag td:first-child{box-shadow:inset 4px 0 0 #E5B93C}
+.pv td.who{font-weight:600}
+.pv .src{color:#888;font-size:.74rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.legend i{display:inline-block;width:14px;height:14px;border:1px solid #bbb;vertical-align:-2px;margin-right:4px}
+.bk{display:inline-block;font-size:.82rem;font-weight:700;padding:2px 10px;border-radius:99px;color:#fff;background:#1A6EFF}
+.bk1{background:#1A6EFF}.bk2{background:#1D7A46}.bk3{background:#C2491D}.bk4{background:#7B3FBF}.bk5{background:#0E7C86}.bk0{background:#8A5A00}
+.pv td.num{text-align:right}
+#basketList>.card{border-width:2px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1A2B50;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;z-index:50;max-width:90vw}
+textarea{width:100%}
+</style>
+<link rel="stylesheet" href="../../frame.css">
+<script src="../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><h1>🪄 문서 변신 마법사</h1><button type="button" class="btn main" id="demoBtn" style="margin-left:auto">▶ 단계별로 보기 (시연)</button></div>
+  <p class="sub"><b>재료를 넣으면 알아서 구분해 바구니에 나눠 담고</b>, 원하는 <b>그릇(내 양식)</b>을 넣으면 그 모양에 맞춰 담아 줍니다. 마법처럼 한 번에 끝나지는 않습니다 — <b>애매한 것은 노랗게 표시</b>하니 확인하고 넘어가세요. 넣은 재료는 이 컴퓨터 밖으로 나가지 않습니다.</p>
+  <div class="flow"><span>① 재료 넣기</span><i>→</i><span>② 재료 구분 · 바구니 확인</span><i>→</i><span>③ 그릇(내 양식) 넣기</span><i>→</i><span>④ 담아서 받기</span></div>
+
+  <section class="panel">
+    <div class="step"><span class="n">1</span><h2>재료 넣기</h2><span class="hint">종류가 달라도 한꺼번에 · 나중에 더 넣어도 됩니다</span></div>
+    <div class="drop" id="dropIn">
+      <b>재료가 든 파일들을 여기에 끌어다 놓기</b>
+      <div class="hint" style="margin-bottom:8px">엑셀(xlsx·xls·csv) · 표가 든 한글(hwpx) — 명단·대장·내역 무엇이든. 알아서 같은 것끼리 모읍니다</div>
+      <label class="btn"><input type="file" id="fileIn" multiple hidden>파일 고르기</label>
+      <button type="button" class="btn" id="sampleIn">예시 ① 사람 재료 3개</button>
+      <button type="button" class="btn" id="sampleIn2">예시 ② 물품 재료 3개</button>
+      <button type="button" class="btn" id="pasteBtn">표를 복사해 붙여 넣기</button>
+    </div>
+    <div id="pasteBox" hidden style="margin-top:10px">
+      <textarea id="pasteArea" rows="4" placeholder="엑셀·한글·누리집의 표를 복사(Ctrl+C)해 여기에 붙여 넣기(Ctrl+V) — 붙이면 재료 하나로 들어갑니다"></textarea>
+    </div>
+    <div id="srcList"></div>
+  </section>
+
+  <section class="panel" id="basketPanel" hidden>
+    <div class="step"><span class="n">2</span><h2>바구니 확인</h2><span class="hint">재료를 구분해 담은 결과 — 같은 것끼리 한 바구니에</span></div>
+    <div id="basketList"></div>
+    <div class="legend"><span><i style="background:#ffe9a8"></i>재료마다 값이 다름 — 골라 주세요</span><span><i style="background:#eaf6ee"></i>고른 값</span><span><i style="background:#e8f0ff"></i>직접 고친 값</span><span><i style="background:#fafafa"></i>어느 재료에도 없음</span><span>🔑 = 같은 대상인지 맞춰 본 기준 칸</span><span>칸을 눌러 바로 고칠 수 있습니다 · 줄 앞 체크를 끄면 그 줄은 뺍니다</span></div>
+  </section>
+
+  <section class="panel" id="tplPanel" hidden>
+    <div class="step"><span class="n">3</span><h2>그릇(내 양식) 넣기</h2><span class="hint">그릇을 여러 개 넣으면 각각 담습니다</span></div>
+    <div class="drop" id="dropTpl">
+      <b>채울 양식 파일을 여기에 끌어다 놓기</b>
+      <div class="hint" style="margin-bottom:8px">엑셀(xlsx)·한글(hwpx) — <strong>목록 모양</strong>(머리글 줄 아래 빈 줄)이든 <strong>한 건마다 한 장</strong>(「성명」 칸 옆 빈칸, 문장 속 {이름})이든. 칸에 맞는 바구니를 알아서 고릅니다</div>
+      <label class="btn"><input type="file" id="fileTpl" multiple hidden>양식 고르기</label>
+      <button type="button" class="btn" id="sampleTplX">예시: 비상연락망(엑셀)</button>
+      <button type="button" class="btn" id="sampleTplH">예시: 비상연락망(한글)</button>
+      <button type="button" class="btn" id="sampleTplG">예시: 물품 현황표(엑셀)</button>
+      <button type="button" class="btn" id="sampleTplF">예시: 개인별 카드(한글 · 한 건마다 한 장)</button>
+    </div>
+    <div id="tplList"></div>
+  </section>
+
+  <section class="panel">
+    <h2>알아 두기</h2>
+    <ul class="hint" style="margin:0;padding-left:18px">
+      <li><b>재료를 구분하는 규칙</b> — 칸 구성이 거의 같은 재료는 <b>아래로 쌓고</b>, 이름·관리번호처럼 값이 겹치는 칸을 함께 가진 재료는 그 칸을 기준으로 <b>옆으로 맞추고</b>, 서로 관계없는 재료는 <b>바구니를 따로</b> 둡니다. 자동으로 정한 것은 바구니에서 바꿀 수 있습니다.</li>
+      <li>머리글은 사전에 있는 낱말이면 같은 뜻끼리 묶고(성명=이름, 휴대폰=연락처), 처음 보는 머리글은 그대로 항목이 됩니다.</li>
+      <li>읽기 어려운 재료는 억지로 읽지 않고, <b>먼저 바꿔 올 도구</b>를 알려 드립니다(옛 hwp → hwpx, 합친 칸이 많은 엑셀 → 표 청소기).</li>
+      <li>그릇은 <b>원래 파일을 그대로 열어 칸만 채웁니다</b> — 글꼴·테두리·제목이 그대로 남습니다. 빈 줄이 모자라면 마지막 빈 줄을 본떠 늘립니다.</li>
+      <li><b>한 건마다 한 장</b> — 「성명」「주소」 같은 이름표 칸의 오른쪽이나 아래 빈칸을 찾아 채우고, 문장 속에는 <b>{이름}</b>처럼 중괄호로 적어 둔 자리를 바꿉니다. 건마다 파일 하나씩 묶음(zip)으로, 한글은 한 파일에 쪽마다 한 건으로도 받습니다.</li>
+      <li>아직 안 되는 것: PDF·사진 속 표, 거래 내역에 거래처 정보 붙이기 같은 「여러 줄 ↔ 한 줄」 맞추기, 「이 변신 저장」.</li>
+    </ul>
+  </section>
+  <footer>
+    <p class="hint" style="margin:0 0 6px">쓰다가 못 알아보는 칸·이상하게 나뉜 바구니·안 맞는 양식이 있으면 알려 주세요. 여러분이 써 본 사례로 계속 고쳐 갑니다.</p>
+    
+    <div data-jt-contact class="hint">만든 사람 김태균 · 도구 문의·의견: jahwalktg@gmail.com</div>
+  </footer>
+</div>
+<script src="../../lib/xlsx.full.min.js"></script>
+<script src="../../lib/jszip.min.js"></script>
+<script src="mini.js?v=1"></script>
+<!-- 엑셀·한글 부품은 8번 뚝딱 한엑피 공방 것을 그대로 불러 씀 (한 곳만 고치면 둘 다 반영) -->
+<script src="../office/lib/hwpx.js?v=1"></script>
+<script src="../office/lib/xlsxw.js?v=3"></script>
+<script src="../office/lib/xlkit.js?v=1"></script>
+<script src="app.js?v=4"></script>
+<script src="demo.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엑셀 표 → 한글 표 — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+.lay{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:14px;align-items:start}
+.opts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px}
+.opts .w2{grid-column:1/-1}
+#paste{min-height:120px;font-family:Consolas,monospace;font-size:.82rem}
+.paper{background:#fff;color:#111;border:1px solid var(--line);border-radius:6px;padding:14px;overflow:auto}
+.paper .pt{font-family:"Malgun Gothic",sans-serif;font-weight:700;text-align:center;margin:0 0 6px}
+.paper .pu{font-family:"Malgun Gothic",sans-serif;font-size:9pt;text-align:right;margin:0 0 2px}
+.paper table{border-collapse:collapse;font-family:"Malgun Gothic",sans-serif;table-layout:fixed}
+.paper td{border:1px solid #000;padding:2px 4px;font-size:9pt;line-height:1.35;white-space:pre-wrap;vertical-align:middle}
+.paper td.g{background:#d9d9d9;font-weight:700;text-align:center}
+.paper td.r{text-align:right}.paper td.c{text-align:center}
+.paper tr.sum td{background:#f2f2f2;font-weight:700}
+.info{font-size:.86rem;color:var(--muted);margin:6px 0 0}
+.info.ok{color:var(--ok)}
+#sheetRow{margin-top:8px}
+.out{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+@media (max-width:860px){.lay{grid-template-columns:minmax(0,1fr)}}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">엑셀에서 표를 복사해 붙이거나 파일을 넣으면, 바로 열리는 한글 문서(hwpx)로 만들어 줍니다. <b>합친 칸·숫자 쉼표·회색 머리·합계 줄</b>까지 — 한글에서 표 테두리 다시 그리던 일을 줄입니다.</p>
+  <div class="lay" style="margin-top:12px">
+    <div>
+      <section class="panel">
+        <div class="step"><span class="n">1</span><h2>표 넣기</h2></div>
+        <div class="drop" id="drop">
+          <b>엑셀에서 복사(Ctrl+C) → 아래 칸에 붙이기(Ctrl+V)</b>
+          <textarea id="paste" placeholder="여기에 붙여 넣으세요. 엑셀에서 복사하면 합친 칸도 살아 있습니다."></textarea>
+          <div class="hint" style="margin:8px 0 6px">또는 파일을 끌어다 놓기 (xlsx·xls·csv)</div>
+          <label class="btn"><input type="file" id="file" accept=".xlsx,.xls,.xlsm,.csv" hidden>파일 고르기</label>
+          <button type="button" class="btn" id="sample">예시 표 넣어 보기</button>
+        </div>
+        <div class="row" id="sheetRow" hidden><label class="f" style="flex:1">시트<select id="sheet"></select></label><label class="f" style="flex:1">범위 (비우면 전체)<input type="text" id="range" placeholder="예: A3:H20"></label></div>
+        <p class="info" id="info"></p>
+      </section>
+      <section class="panel">
+        <div class="step"><span class="n">2</span><h2>모양 정하기</h2></div>
+        <div class="opts">
+          <label class="f w2">표 제목 (비우면 없음)<input type="text" id="title" placeholder="예: 2026년 10월 부서별 예산 집행 현황"></label>
+          <label class="f">제목 크기<select id="titleSize"><option value="sub">보통 (12pt)</option><option value="title">크게 (24pt)</option></select></label>
+          <label class="f">단위 (표 오른쪽 위)<input type="text" id="unit" placeholder="예: (단위: 원)"></label>
+          <label class="f">머리 줄 수<select id="headN"><option value="0">없음</option><option value="1" selected>1줄</option><option value="2">2줄</option><option value="3">3줄</option></select></label>
+          <label class="f">첫 칸(줄 이름)<select id="firstCol"><option value="">다른 칸과 같게</option><option value="gray">회색 머리처럼</option></select></label>
+          <label class="f">글자 칸 정렬<select id="align"><option value="center">가운데</option><option value="left">왼쪽</option></select></label>
+          <label class="f">글자 크기<select id="size"><option value="cap">9pt</option><option value="text">10pt</option></select></label>
+          <label class="f">쪽 방향<select id="land"><option value="">세로 (A4)</option><option value="1">가로 (A4)</option></select></label>
+          <label class="f">표 폭 (mm)<input type="number" id="bodyW" min="60" max="280" step="1" value="170"></label>
+          <label class="f">칸 폭<select id="widthMode"><option value="auto">글자 길이에 맞춰</option><option value="eq">모두 똑같이</option></select></label>
+          <label class="f">줄 높이 (mm)<input type="number" id="rowH" min="5" max="20" step="0.5" value="7"></label>
+          <label class="chk w2"><input type="checkbox" id="comma" checked> 숫자에 쉼표 넣고 오른쪽 정렬</label>
+          <label class="chk w2"><input type="checkbox" id="sum"> 맨 아래 「합계」 줄 넣기 (숫자 칸만 더함)</label>
+          <label class="chk w2"><input type="checkbox" id="trim" checked> 완전히 빈 줄·빈 칸 빼기</label>
+        </div>
+        <p class="hint" style="margin:8px 0 0">표 폭 기본: 세로 A4 170mm · 가로 A4 257mm (한글 기본 여백). 운영보고처럼 여백이 좁은 문서는 189mm 등으로.</p>
+      </section>
+    </div>
+    <section class="panel">
+      <div class="step"><span class="n">3</span><h2>미리 보기 · 받기</h2></div>
+      <div class="paper" id="paper"><p class="hint" style="color:#666">표를 넣으면 여기에 한글 문서 모양으로 보입니다.</p></div>
+      <div class="out">
+        <button type="button" class="btn main" id="dlHwp" disabled>한글 파일(hwpx) 받기</button>
+        <button type="button" class="btn" id="copyHtml" disabled>한글에 붙일 표 복사</button>
+      </div>
+      <p class="hint">「한글 파일 받기」는 새 문서로, 「표 복사」는 쓰고 있는 한글 문서에 바로 붙여 넣을 때 씁니다(칸 폭은 mm로 맞춰 둠). hwpx는 한글 2014 이상에서 열립니다.</p>
+    </section>
+  </div>
+  
+</div>
+<script src="../../../lib/xlsx.full.min.js"></script>
+<script src="../lib/hwpx.js?v=1"></script>
+<script src="../core.js?v=7"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc;
+  O.header('xl2hwp');
+  /* 표 모델: rows = [[{ t: 글자, n: 숫자 또는 null }]], merges = [{ r, c, rs, cs }] */
+  var model = null, wb = null, fileName = '';
+
+  /* ---------- 숫자 알아보기 ---------- */
+  function toNum(s) {
+    s = String(s == null ? '' : s).trim(); if (!s) return null;
+    if (!/^[-+(]?[₩\\]?\s*[\d,]*\.?\d+\)?$/.test(s)) return null;
+    if (/,/.test(s) && !/^[-+(]?[₩\\]?\s*\d{1,3}(,\d{3})*(\.\d+)?\)?$/.test(s)) return null;   // 1,2,3 같은 건 숫자 아님
+    if (/^0\d/.test(s.replace(/^[-+(₩\\\s]+/, ''))) return null;   // 앞자리 0(계좌·전화)은 글자로
+    var neg = /^\(.*\)$/.test(s) || /^-/.test(s), v = parseFloat(s.replace(/[^\d.]/g, ''));
+    return isNaN(v) ? null : (neg ? -v : v);
+  }
+  function decOf(s) { var m = String(s).match(/\.(\d+)/); return m ? m[1].length : 0; }
+  function fmt(v, dec) { return v.toLocaleString('ko-KR', { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+
+  /* ---------- 붙여넣기: 엑셀 HTML(합친 칸 살아 있음) 먼저, 없으면 탭 글자 ---------- */
+  function fromHtml(html) {
+    var doc = new DOMParser().parseFromString(html, 'text/html'), tb = doc.querySelector('table'); if (!tb) return null;
+    var rows = [], merges = [], occ = {};
+    [].forEach.call(tb.rows, function (tr, r) {
+      rows[r] = rows[r] || []; var c = 0;
+      [].forEach.call(tr.cells, function (td) {
+        while (occ[r + ',' + c]) c++;
+        var cs = Math.max(1, +td.colSpan || 1), rs = Math.max(1, +td.rowSpan || 1);
+        td.querySelectorAll('br').forEach(function (b) { b.replaceWith('\n'); });
+        var t = td.textContent.replace(/ /g, ' ').replace(/[ \t\r]*\n[ \t\r]*/g, '\n').trim();
+        rows[r][c] = { t: t, n: toNum(t) };
+        if (cs > 1 || rs > 1) merges.push({ r: r, c: c, rs: rs, cs: cs });
+        for (var i = 0; i < rs; i++) for (var j = 0; j < cs; j++) { occ[(r + i) + ',' + (c + j)] = 1; if (i || j) { rows[r + i] = rows[r + i] || []; rows[r + i][c + j] = { t: '', n: null, covered: true }; } }
+        c += cs;
+      });
+    });
+    return norm({ rows: rows, merges: merges });
+  }
+  function fromText(txt) {
+    var rows = [], row = [], cell = '', q = false, i = 0; txt = txt.replace(/\r\n?/g, '\n');
+    var sep = txt.indexOf('\t') >= 0 ? '\t' : (txt.indexOf(',') >= 0 ? ',' : '\t');
+    for (; i < txt.length; i++) {
+      var ch = txt[i];
+      if (q) { if (ch === '"') { if (txt[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; continue; }
+      if (ch === '"' && cell === '') { q = true; continue; }
+      if (ch === sep) { row.push(cell); cell = ''; continue; }
+      if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; continue; }
+      cell += ch;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return norm({ rows: rows.map(function (r) { return r.map(function (t) { t = t.trim(); return { t: t, n: toNum(t) }; }); }), merges: [] });
+  }
+  function fromSheet(ws, ref) {
+    if (!ws || !ws['!ref']) return null;
+    var rg = XLSX.utils.decode_range(ref || ws['!ref']), rows = [];
+    for (var r = rg.s.r; r <= rg.e.r; r++) {
+      var row = [];
+      for (var c = rg.s.c; c <= rg.e.c; c++) {
+        var cell = ws[XLSX.utils.encode_cell({ r: r, c: c })];
+        if (!cell || cell.v == null) { row.push({ t: '', n: null }); continue; }
+        var w = cell.w != null ? String(cell.w) : String(cell.v), isDate = cell.t === 'd' || (cell.t === 'n' && cell.z && XLSX.SSF.is_date(cell.z));
+        if (cell.t === 'n' && !isDate && toNum(w) != null) row.push({ t: w.trim(), n: cell.v, dec: Math.min(decOf(w), 4) });
+        else row.push({ t: w.trim(), n: null });
+      }
+      rows.push(row);
+    }
+    var merges = (ws['!merges'] || []).filter(function (m) { return m.s.r >= rg.s.r && m.s.c >= rg.s.c && m.e.r <= rg.e.r && m.e.c <= rg.e.c; })
+      .map(function (m) { return { r: m.s.r - rg.s.r, c: m.s.c - rg.s.c, rs: m.e.r - m.s.r + 1, cs: m.e.c - m.s.c + 1 }; });
+    merges.forEach(function (m) { for (var i = 0; i < m.rs; i++) for (var j = 0; j < m.cs; j++) if (i || j) rows[m.r + i][m.c + j] = { t: '', n: null, covered: true }; });
+    return norm({ rows: rows, merges: merges });
+  }
+  function norm(m) {
+    var W = m.rows.reduce(function (a, r) { return Math.max(a, r ? r.length : 0); }, 0);
+    m.rows = m.rows.map(function (r) { r = r || []; for (var c = 0; c < W; c++) if (!r[c]) r[c] = { t: '', n: null }; return r; });
+    return m.rows.length && W ? m : null;
+  }
+  /* 빈 줄·빈 칸 빼기 (합친 칸이 걸친 줄·칸은 남김) */
+  function trimModel(m) {
+    var H = m.rows.length, W = m.rows[0].length, keepR = [], keepC = [];
+    var used = function (r, c) { var x = m.rows[r][c]; return x.t !== '' || m.merges.some(function (g) { return r >= g.r && r < g.r + g.rs && c >= g.c && c < g.c + g.cs; }); };
+    for (var r = 0; r < H; r++) { var any = false; for (var c = 0; c < W; c++) if (used(r, c)) { any = true; break; } if (any) keepR.push(r); }
+    for (var c2 = 0; c2 < W; c2++) { var any2 = false; for (var r2 = 0; r2 < H; r2++) if (used(r2, c2)) { any2 = true; break; } if (any2) keepC.push(c2); }
+    if (!keepR.length || !keepC.length) return null;
+    var rows = keepR.map(function (r) { return keepC.map(function (c) { return m.rows[r][c]; }); });
+    var merges = m.merges.map(function (g) {
+      var rr = keepR.filter(function (r) { return r >= g.r && r < g.r + g.rs; }), cc = keepC.filter(function (c) { return c >= g.c && c < g.c + g.cs; });
+      return rr.length && cc.length ? { r: keepR.indexOf(rr[0]), c: keepC.indexOf(cc[0]), rs: rr.length, cs: cc.length } : null;
+    }).filter(Boolean);
+    return { rows: rows, merges: merges };
+  }
+
+  /* ---------- 자동 알아보기: 머리 줄 수 · 원래 있던 합계 줄 ---------- */
+  var TOT_RE = /^(합계|총계|소계|누계|계|총합|합|총액|전체)$/;
+  function totKind(row) {   // 'sum'(합계·총계) / 'sub'(소계) / ''
+    for (var c = 0; c < row.length; c++) { var x = row[c]; if (x.covered || x.t === '') continue; var k = x.t.replace(/[\s()\[\]·:]/g, ''); return TOT_RE.test(k) ? (/^소계/.test(k) ? 'sub' : 'sum') : ''; }
+    return '';
+  }
+  function rowHasNum(row) { return row.some(function (x) { return !x.covered && x.n != null; }); }
+  function rowAllText(row) { var any = false; for (var i = 0; i < row.length; i++) { var x = row[i]; if (x.covered || x.t === '') continue; any = true; if (x.n != null) return false; } return any; }
+  function guessHead(m) {
+    var H = m.rows.length; if (H < 2) return 1;
+    if (!m.rows.some(rowHasNum)) return 1;
+    var h = 1, changed = true;
+    while (changed && h < 3 && h < H - 1) {
+      changed = false;
+      /* 머리 안에서 시작한 합친 칸이 아래 줄까지 내려오면 그 줄까지 머리 */
+      m.merges.forEach(function (g) { if (g.r < h && g.r + g.rs > h) { h = Math.min(3, g.r + g.rs); changed = true; } });
+      /* 머리 마지막 줄에 가로로 합친 칸(「참여기간」 위 칸 등)이 있고, 바로 아래 줄이 숫자 없는 글자 줄이면 그 줄도 머리 */
+      if (!changed && h < H - 1 && m.merges.some(function (g) { return g.r === h - 1 && g.cs > 1; }) && rowAllText(m.rows[h]) && rowHasNum(m.rows[h + 1] || [])) { h++; changed = true; }
+    }
+    return Math.max(1, Math.min(3, h));
+  }
+
+  /* ---------- 설정 → 표 그리기 자료 ---------- */
+  function opts() {
+    return { title: $('title').value.trim(), titleSize: $('titleSize').value, unit: $('unit').value.trim(), headN: +$('headN').value, firstCol: $('firstCol').value,
+      align: $('align').value, size: $('size').value, land: !!$('land').value, bodyW: Math.max(60, Math.min(280, +$('bodyW').value || 170)), widthMode: $('widthMode').value,
+      rowH: Math.max(5, Math.min(20, +$('rowH').value || 7)), comma: $('comma').checked, sum: $('sum').checked, trim: $('trim').checked };
+  }
+  function vlen(s) { return String(s).split('\n').reduce(function (a, line) { var n = 0; for (var i = 0; i < line.length; i++) n += line.charCodeAt(i) > 0x2e80 ? 2 : 1; return Math.max(a, n); }, 0); }
+  function build() {
+    if (!model) return null;
+    var o = opts(), m = o.trim ? trimModel(model) : model; if (!m) return null;
+    var H = m.rows.length, W = m.rows[0].length, headN = Math.min(o.headN, H);
+    var mergeAt = {}; m.merges.forEach(function (g) { mergeAt[g.r + ',' + g.c] = g; });
+    var totRow = {}; for (var rt = headN; rt < H; rt++) { var tk = totKind(m.rows[rt]); if (tk) totRow[rt] = tk; }
+    /* 숫자 칸: 머리 아래에서 숫자가 절반 넘는 칸 */
+    var numCol = [];
+    for (var c = 0; c < W; c++) { var nn = 0, tt = 0; for (var r = headN; r < H; r++) { var x = m.rows[r][c]; if (x.covered || x.t === '') continue; tt++; if (x.n != null) nn++; } numCol[c] = tt > 0 && nn / tt > .5; }
+    var dec = []; for (var c3 = 0; c3 < W; c3++) { dec[c3] = 0; for (var r3 = headN; r3 < H; r3++) { var y = m.rows[r3][c3]; if (y.n != null) dec[c3] = Math.max(dec[c3], y.dec != null ? y.dec : decOf(y.t)); } dec[c3] = Math.min(dec[c3], 4); }
+    function text(x, c) { if (x.n != null && o.comma && numCol[c]) return fmt(x.n, Math.min(x.dec != null ? x.dec : decOf(x.t), 4)); return x.t; }   // 칸마다 원래 소수 자릿수 그대로
+    var out = [];
+    for (var r4 = 0; r4 < H; r4++) {
+      var row = [];
+      for (var c4 = 0; c4 < W; c4++) {
+        var z = m.rows[r4][c4]; if (z.covered) continue;
+        var head = r4 < headN, tot = !head && totRow[r4], g = mergeAt[r4 + ',' + c4], first = c4 === 0 && o.firstCol === 'gray' && !head;
+        var cell = { t: text(z, c4), style: head || first ? 'label' : o.size };
+        if (head || first) { cell.gray = true; cell.align = 'center'; }
+        else cell.align = (z.n != null && o.comma && numCol[c4]) ? 'right' : o.align;
+        if (tot) { cell.gray = true; cell.style = 'label'; if (z.n == null) cell.align = 'center'; }
+        if (g) { if (g.cs > 1) cell.cs = g.cs; if (g.rs > 1) cell.rs = g.rs; }
+        row.push(cell);
+      }
+      out.push(row);
+    }
+    if (o.sum && H > headN) {
+      var sr = [{ t: '합계', gray: true, align: 'center', style: 'label' }], any = false;
+      for (var c5 = 1; c5 < W; c5++) {
+        if (!numCol[c5]) { sr.push({ t: '', style: o.size, sum: true }); continue; }
+        var s = 0; for (var r5 = headN; r5 < H; r5++) { if (totRow[r5]) continue; var q = m.rows[r5][c5]; if (q.n != null && !q.covered) s += q.n; }
+        any = true; sr.push({ t: fmt(Math.round(s * Math.pow(10, dec[c5])) / Math.pow(10, dec[c5]), o.comma ? dec[c5] : dec[c5]), align: 'right', style: 'label', sum: true });
+      }
+      if (any && W > 1) { if (!o.comma) sr.forEach(function (x) { if (x.sum && x.t) x.t = x.t.replace(/,/g, ''); }); out.push(sr); }
+    }
+    /* 칸 폭 */
+    var weights = [];
+    for (var c6 = 0; c6 < W; c6++) {
+      if (o.widthMode === 'eq') { weights[c6] = 1; continue; }
+      var mx = 2;
+      for (var r6 = 0; r6 < H; r6++) { var u = m.rows[r6][c6]; if (u.covered) continue; var gg = mergeAt[r6 + ',' + c6]; if (gg && gg.cs > 1) continue; mx = Math.max(mx, vlen(text(u, c6))); }
+      weights[c6] = Math.min(Math.max(mx, 4), 36) + 2;
+    }
+    var tw = weights.reduce(function (a, b) { return a + b; }, 0);
+    var widths = weights.map(function (w) { return Math.round(w / tw * o.bodyW * 10) / 10; });
+    return { o: o, rows: out, widths: widths, H: out.length, W: W, tots: Object.keys(totRow).length };
+  }
+  function blocks(b) {
+    var bl = [];
+    if (b.o.title) bl.push({ k: 'p', t: b.o.title, align: 'center', style: b.o.titleSize });
+    if (b.o.unit) bl.push({ k: 'p', t: b.o.unit, align: 'right', style: 'cap' });
+    bl.push({ k: 'table', widths: b.widths, rows: b.rows, h: b.o.rowH });
+    return bl;
+  }
+  /* ---------- 미리 보기 (같은 자료로 HTML 표) ---------- */
+  function tableHtml(b, forCopy) {
+    var pt = b.o.size === 'text' ? '10pt' : '9pt';
+    var bd = forCopy ? 'border:0.5pt solid #000;' : '';
+    var h = '<table style="border-collapse:collapse;table-layout:fixed;width:' + b.widths.reduce(function (a, x) { return a + x; }, 0).toFixed(1) + 'mm;font-family:\'맑은 고딕\',\'Malgun Gothic\',sans-serif"><colgroup>' + b.widths.map(function (w) { return '<col style="width:' + w + 'mm">'; }).join('') + '</colgroup>';
+    b.rows.forEach(function (r) {
+      h += '<tr style="height:' + b.o.rowH + 'mm">';
+      r.forEach(function (c) {
+        var st = bd + 'font-size:' + (c.style === 'label' ? '10pt' : pt) + ';padding:1pt 3pt;text-align:' + (c.align || 'left') + ';vertical-align:middle;' + (c.gray ? 'background:#d9d9d9;font-weight:bold;' : c.style === 'label' ? 'font-weight:bold;' : '') + (forCopy ? 'color:#000;' : '');
+        h += '<td' + (c.cs > 1 ? ' colspan="' + c.cs + '"' : '') + (c.rs > 1 ? ' rowspan="' + c.rs + '"' : '') + ' style="' + st + '">' + esc(c.t).replace(/\n/g, '<br>') + '</td>';
+      });
+      h += '</tr>';
+    });
+    return h + '</table>';
+  }
+  function render() {
+    var b = build(), p = $('paper');
+    $('dlHwp').disabled = $('copyHtml').disabled = !b;
+    if (!b) { p.innerHTML = '<p class="hint" style="color:#666">표를 넣으면 여기에 한글 문서 모양으로 보입니다.</p>'; return; }
+    p.innerHTML = (b.o.title ? '<p class="pt" style="font-size:' + (b.o.titleSize === 'title' ? '24pt' : '12pt') + '">' + esc(b.o.title) + '</p>' : '') + (b.o.unit ? '<p class="pu" style="width:' + b.o.bodyW + 'mm">' + esc(b.o.unit) + '</p>' : '') + tableHtml(b, false);
+    p.querySelector('table').querySelectorAll('td').forEach(function (td) { td.style.border = '1px solid #000'; });
+  }
+  /* 맨 위에 한 칸만 적힌 줄(제목)·「(단위: 원)」 줄은 표에서 떼어 제목·단위 칸으로 */
+  function liftTitle(m) {
+    if (!m) return m; var lifted = [];
+    function only(r) { var row = m.rows[r]; if (!row) return null; var f = row.filter(function (x) { return !x.covered && x.t !== ''; }); return f.length === 1 ? f[0].t : (f.length ? false : ''); }
+    function drop(r) { m.rows.splice(r, 1); m.merges = m.merges.filter(function (g) { return g.r !== r; }).map(function (g) { if (g.r > r) g.r--; return g; }); }
+    if (m.rows[0].length < 3) return m;
+    for (var k = 0; k < 4 && m.rows.length > 2; k++) {
+      var t = only(0); if (t === false) break;
+      if (t === '') { drop(0); continue; }
+      if (/^[(\[]?\s*단위/.test(t)) { if (!$('unit').value) $('unit').value = t; lifted.push('단위'); drop(0); continue; }
+      if (lifted.indexOf('제목') >= 0) break;
+      if (!$('title').value) $('title').value = t; lifted.push('제목'); drop(0);
+    }
+    /* 표 바로 위가 아니라 표 첫 줄 오른쪽 끝에만 「(단위…)」가 있는 경우도 */
+    m.lifted = lifted; return m;
+  }
+  var keepSum = false, autoSum = false;   // 예시 단추는 합계 넣기를 켠 채로 시작
+  function setModel(m, msg) {
+    m = liftTitle(m); model = m;
+    var inf = $('info');
+    if (!m) { inf.className = 'info'; inf.textContent = msg || '표를 읽지 못했습니다. 엑셀에서 칸을 골라 복사했는지 확인해 주세요.'; render(); return; }
+    var mm = $('trim').checked ? (trimModel(m) || m) : m, hn = guessHead(mm), hasSum = false, hasSub = false;
+    for (var r = hn; r < mm.rows.length; r++) { var tk = totKind(mm.rows[r]); if (tk === 'sum') hasSum = true; if (tk === 'sub') hasSub = true; }
+    $('headN').value = String(hn);
+    if (!keepSum) $('sum').checked = !hasSum && autoSum;
+    var auto = ' · 자동: 머리 ' + hn + '줄' + (hasSum ? ' · 원래 합계 줄 있음(회색으로, 새 합계 안 넣음)' : '') + (hasSub ? ' · 소계 줄 회색' : '');
+    inf.className = 'info ok'; inf.textContent = (msg || '') + '✓ ' + m.rows.length + '줄 × ' + m.rows[0].length + '칸' + auto.replace(/^ · /, ' · ') + (m.merges.length ? ' · 합친 칸 ' + m.merges.length + '곳 살림' : '') + (m.lifted && m.lifted.length ? ' · 맨 위 ' + m.lifted.join('·') + ' 줄은 ' + m.lifted.join('·') + ' 칸으로 옮김' : '');
+    render();
+  }
+  /* ---------- 입력 연결 ---------- */
+  $('paste').addEventListener('paste', function (e) {
+    var cd = e.clipboardData; if (!cd) return;
+    var html = cd.getData('text/html'), txt = cd.getData('text/plain');
+    if (html && /<table/i.test(html)) { var m = fromHtml(html); if (m) { e.preventDefault(); $('paste').value = txt || ''; fileName = ''; $('sheetRow').hidden = true; setModel(m, '붙여 넣은 표 '); return; } }
+  });
+  var pt = 0;
+  $('paste').addEventListener('input', function () { clearTimeout(pt); pt = setTimeout(function () { var v = $('paste').value; if (!v.trim()) { setModel(null, ''); return; } fileName = ''; $('sheetRow').hidden = true; setModel(fromText(v), '붙여 넣은 글 '); }, 250); });
+  function loadSheet() { if (!wb) return; var ws = wb.Sheets[$('sheet').value], ref = $('range').value.trim().toUpperCase(); try { setModel(fromSheet(ws, ref && /^[A-Z]+\d+:[A-Z]+\d+$/.test(ref) ? ref : null), fileName + ' › ' + $('sheet').value + ' '); } catch (e) { setModel(null, '이 시트를 읽지 못했습니다: ' + e.message); } }
+  O.bindDrop($('drop'), $('file'), function (files) {
+    var f = files.filter(function (x) { return /\.(xlsx|xlsm|xls|csv)$/i.test(x.name); })[0];
+    if (!f) { O.toast('엑셀(xlsx·xls)이나 csv 파일을 넣어 주세요.'); return; }
+    O.readBuf(f).then(function (buf) {
+      try { wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellNF: true, cellStyles: false }); } catch (e) { setModel(null, '파일을 열지 못했습니다(암호가 걸렸거나 다른 형식): ' + e.message); return; }
+      fileName = f.name.replace(/\.[^.]+$/, '');
+      $('sheet').innerHTML = wb.SheetNames.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('');
+      $('sheetRow').hidden = false; $('range').value = ''; $('paste').value = '';
+      if (!$('title').value) $('title').placeholder = fileName;
+      loadSheet();
+    });
+  });
+  $('sum').addEventListener('change', function () { keepSum = true; });
+  $('sheet').onchange = loadSheet; $('range').onchange = loadSheet;
+  $('land').onchange = function () { var w = +$('bodyW').value; if (this.value && w === 170) $('bodyW').value = 257; if (!this.value && w === 257) $('bodyW').value = 170; render(); };
+  ['title', 'titleSize', 'unit', 'headN', 'firstCol', 'align', 'size', 'bodyW', 'widthMode', 'rowH', 'comma', 'sum', 'trim'].forEach(function (id) { $(id).addEventListener('input', render); $(id).addEventListener('change', render); });
+  $('sample').onclick = function () {
+    $('paste').value = '부서\t9월 집행액\t10월 집행액\t증감\t비고\n총무팀\t12,480,000\t13,120,500\t640,500\t\n기획팀\t8,215,300\t7,990,000\t-225,300\t행사 연기\n상담팀\t5,600,000\t6,050,000\t450,000\t\n교육팀\t31,402,880\t32,115,400\t712,520\t2개 과정';
+    $('title').value = '2026년 부서별 예산 집행 현황(예시)'; $('unit').value = '(단위: 원)'; fileName = ''; $('sheetRow').hidden = true;
+    autoSum = true; setModel(fromText($('paste').value), '예시 표 '); autoSum = false;
+  };
+  /* ---------- 받기 ---------- */
+  $('dlHwp').onclick = function () {
+    var b = build(); if (!b) return;
+    var name = (b.o.title || fileName || '표').replace(/[\\/:*?"<>|]/g, '').slice(0, 60);
+    var bytes = Hwpx.textDoc(blocks(b), name, { bodyW: b.o.bodyW, landscape: b.o.land });
+    O.download(name + '.hwpx', bytes); O.toast('한글 파일을 내려받았습니다.');
+  };
+  $('copyHtml').onclick = function () {
+    var b = build(); if (!b) return;
+    var html = '<html><body>' + tableHtml(b, true) + '</body></html>', plain = b.rows.map(function (r) { return r.map(function (c) { return c.t; }).join('\t'); }).join('\n');
+    function fallback() { var d = document.createElement('div'); d.contentEditable = 'true'; d.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff'; d.innerHTML = tableHtml(b, true); document.body.appendChild(d); var rg = document.createRange(); rg.selectNodeContents(d); var s = getSelection(); s.removeAllRanges(); s.addRange(rg); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { } s.removeAllRanges(); d.remove(); O.toast(ok ? '표를 복사했습니다. 한글에서 Ctrl+V 하세요.' : '복사가 막혔습니다. 「한글 파일 받기」를 써 주세요.'); }
+    if (navigator.clipboard && window.ClipboardItem) navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]).then(function () { O.toast('표를 복사했습니다. 한글에서 Ctrl+V 하세요.'); }, fallback);
+    else fallback();
+  };
+  window._xl2hwp = { fromHtml: fromHtml, fromText: fromText, setModel: setModel, build: build, blocks: blocks };
+})();
+</script>
+</body>
+</html>

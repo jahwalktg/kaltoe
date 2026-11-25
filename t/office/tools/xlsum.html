@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>피벗 없이 집계표 — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+.lay{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:14px;align-items:start}
+.opts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px}
+.opts .w2{grid-column:1/-1}
+.vals{display:flex;flex-wrap:wrap;gap:4px 14px;padding:4px 0}
+.pv{max-height:480px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.pv table{border-collapse:collapse;font-size:.84rem;background:#fff;color:#111;white-space:nowrap}
+.pv th,.pv td{border:1px solid #999;padding:3px 8px}
+.pv th{background:#e7e6e6}
+.pv td.n{text-align:right}
+.pv tr.tot td{background:#f2f2f2;font-weight:700}
+.pv td.tot{background:#f7f7f7;font-weight:700}
+.out{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:10px}
+@media (max-width:860px){.lay{grid-template-columns:minmax(0,1fr)}}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">피벗 테이블을 몰라도 됩니다. <b>무엇별로</b>(부서·월…) <b>무엇을</b>(급여·인원…) <b>어떻게</b>(합계·개수·평균) 셀지만 고르면 집계표가 나오고, 그대로 엑셀이나 한글 표로 받습니다.</p>
+  <section class="panel" style="margin-top:12px">
+    <div class="step"><span class="n">1</span><h2>표 넣기</h2></div>
+    <div id="pick"></div>
+  </section>
+  <div class="lay" id="work" hidden>
+    <section class="panel">
+      <div class="step"><span class="n">2</span><h2>무엇별로 · 무엇을</h2></div>
+      <div class="opts">
+        <label class="f w2">줄 기준 (세로로 늘어설 것)<select id="r1"></select></label>
+        <label class="f w2">줄 기준 2 (그 안에서 한 번 더 나누기)<select id="r2"></select></label>
+        <label class="f w2">칸 기준 (가로로 펼칠 것, 예: 월)<select id="cK"></select></label>
+        <label class="f">날짜 칸 묶기<select id="dUnit"><option value="m">월별</option><option value="q">분기별</option><option value="y">연도별</option><option value="d">날짜 그대로</option></select></label>
+        <label class="f">계산<select id="agg"><option value="sum">합계</option><option value="cnt">개수(몇 줄)</option><option value="avg">평균</option><option value="max">가장 큰 값</option><option value="min">가장 작은 값</option></select></label>
+        <div class="w2"><div class="hint" style="margin-bottom:2px">값 칸 (셀 숫자) <span id="valNote"></span></div><div class="vals" id="vals"></div></div>
+        <label class="f">정렬<select id="sort"><option value="name">이름 순</option><option value="big">큰 값 순</option><option value="orig">원래 나온 순서</option></select></label>
+        <label class="f">숫자 단위<select id="div"><option value="1">그대로</option><option value="1000">천 원 (버림)</option><option value="10000">만 원 (버림)</option></select></label>
+        <label class="chk"><input type="checkbox" id="totR" checked> 맨 아래 합계 줄</label>
+        <label class="chk"><input type="checkbox" id="totC" checked> 오른쪽 합계 칸 (칸 기준을 고를 때)</label>
+        <label class="chk w2"><input type="checkbox" id="skipSum" checked> 원래 표의 합계·소계 줄은 빼고 세기</label>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="step"><span class="n">3</span><h2>집계표 · 받기</h2><span class="hint" id="sum"></span></div>
+      <div class="pv" id="pv"></div>
+      <div class="out">
+        <label class="f" style="min-width:220px;flex:1">표 제목<input type="text" id="title" placeholder="예: 2026년 부서별 월별 급여 합계"></label>
+        <label class="f" style="width:130px">단위 글<input type="text" id="unit" placeholder="(단위: 원)"></label>
+      </div>
+      <div class="out">
+        <button type="button" class="btn main" id="dlX">엑셀로 받기</button>
+        <button type="button" class="btn main" id="dlH">한글 파일(hwpx)로 받기</button>
+        <button type="button" class="btn" id="cpH">한글에 붙일 표 복사</button>
+        <label class="f" style="width:110px">한글 표 폭(mm)<input type="number" id="bodyW" value="170" min="60" max="280"></label>
+      </div>
+      <p class="hint">칸이 8개를 넘으면 한글은 가로 쪽(폭 257mm)으로 만듭니다. 붙일 문서 여백이 좁으면 표 폭을 189 등으로 바꾸세요.</p>
+    </section>
+  </div>
+  
+</div>
+<script src="../../../lib/xlsx.full.min.js"></script>
+<script src="../lib/hwpx.js?v=1"></script>
+<script src="../lib/xlsxw.js?v=3"></script>
+<script src="../core.js?v=7"></script>
+<script src="../lib/xlkit.js?v=1"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc, K = XK;
+  O.header('xlsum');
+  var src = null, cols = [], valSel = {}, last = null;
+  K.picker($('pick'), { onData: function (d) { src = d; $('work').hidden = !d; if (d) setup(); }, sample: sample });
+
+  function bodyRows() {
+    var skip = $('skipSum').checked;
+    return src.g.slice(src.h + 1).filter(function (r) { if (K.rowEmpty(r)) return false; var f = r.filter(function (x) { return K.txt(x); })[0]; return !(skip && f && K.SUMRE.test(K.txt(f).replace(/\s/g, ''))); });
+  }
+  /* 칸 성격: 숫자 칸 / 날짜 칸 / 글자 칸 */
+  function setup() {
+    var names = K.headNames(src.g, src.h), body = bodyRows();
+    cols = names.map(function (n, c) {
+      var vs = body.map(function (r) { return r[c]; }).filter(function (x) { return K.txt(x); }), nn = 0, dd = 0, uniq = {};
+      vs.forEach(function (x) { if (K.isDateCell(x) || K.dateSerial(K.txt(x)) != null) dd++; else if (K.num(x) != null) nn++; uniq[K.txt(x)] = 1; });
+      var kind = vs.length && dd >= vs.length * .7 ? 'date' : vs.length && nn >= vs.length * .7 ? 'num' : 'text';
+      if (kind === 'num' && /^(연번|번호|순번|no|년도|연도|년|월)$/i.test(K.keyOf(n))) kind = 'text';
+      return { n: n, c: c, kind: kind, k: Object.keys(uniq).length };
+    });
+    var opt = function (list, none) { return (none ? '<option value="">' + none + '</option>' : '') + list.map(function (x) { return '<option value="' + x.c + '">' + esc(x.n) + (x.kind === 'date' ? ' (날짜)' : ' (' + x.k + '가지)') + '</option>'; }).join(''); };
+    var keys = cols.filter(function (x) { return x.kind !== 'num'; });
+    $('r1').innerHTML = opt(keys); $('r2').innerHTML = opt(keys, '없음'); $('cK').innerHTML = opt(keys, '없음 (값 칸을 가로로)');
+    var p1 = keys.filter(function (x) { return /사업단|부서|팀|구분|지점|점포|기관|담당|유형/.test(x.n) && x.k >= 2; })[0] || keys.filter(function (x) { return x.kind === 'text' && x.k >= 2 && x.k <= 60; })[0] || keys[0];
+    if (p1) $('r1').value = p1.c;
+    var dc = keys.filter(function (x) { return x.kind === 'date'; })[0]; $('cK').value = '';
+    valSel = {}; var nums = cols.filter(function (x) { return x.kind === 'num'; });
+    nums.forEach(function (x, i) { valSel[x.c] = i === nums.length - 1 || /금액|급여|매출|합계|지급|인원|수량|금/.test(x.n); });
+    if (nums.length && !nums.some(function (x) { return valSel[x.c]; })) valSel[nums[0].c] = true;
+    $('vals').innerHTML = nums.length ? nums.map(function (x) { return '<label class="chk"><input type="checkbox" data-v="' + x.c + '"' + (valSel[x.c] ? ' checked' : '') + '> ' + esc(x.n) + '</label>'; }).join('') : '<span class="hint">숫자 칸이 없습니다 — 계산을 「개수」로 하면 몇 줄인지 셉니다.</span>';
+    if (!nums.length) $('agg').value = 'cnt';
+    $('vals').querySelectorAll('[data-v]').forEach(function (c) { c.onchange = function () { valSel[c.dataset.v] = c.checked; run(); }; });
+    $('dUnit').parentNode.hidden = !dc;
+    if (src.name && !$('title').value) $('title').placeholder = src.name + ' 집계';
+    run();
+  }
+  function keyOf(x, c) {
+    var col = cols[c]; if (!x || !K.txt(x)) return '(빈 칸)';
+    if (col && col.kind === 'date') {
+      var v = K.isDateCell(x) ? x.v : K.dateSerial(K.txt(x)); if (v == null) return K.txt(x);
+      var p = K.serialYMD(v), u = $('dUnit').value;
+      return u === 'y' ? p.y + '년' : u === 'q' ? p.y + '년 ' + Math.ceil(p.m / 3) + '분기' : u === 'm' ? p.y + '-' + String(p.m).padStart(2, '0') : p.y + '-' + String(p.m).padStart(2, '0') + '-' + String(p.d).padStart(2, '0');
+    }
+    return K.txt(x);
+  }
+  function compute() {
+    var r1 = +$('r1').value, r2 = $('r2').value === '' ? null : +$('r2').value, ck = $('cK').value === '' ? null : +$('cK').value, agg = $('agg').value, div = +$('div').value;
+    var vcs = Object.keys(valSel).filter(function (k) { return valSel[k]; }).map(Number);
+    if (agg === 'cnt' && !vcs.length) vcs = [-1];
+    if (ck != null) vcs = vcs.slice(0, 1);
+    var rowsK = [], rowIdx = {}, colsK = [], colIdx = {}, cell = {}, body = bodyRows();
+    var acc = function (key) { return cell[key] || (cell[key] = { s: 0, n: 0, mx: -Infinity, mn: Infinity }); };
+    var put = function (a, v) { if (v == null) { if (agg === 'cnt') a.n++; return; } a.s += v; a.n++; if (v > a.mx) a.mx = v; if (v < a.mn) a.mn = v; };
+    body.forEach(function (r) {
+      var k1 = keyOf(r[r1], r1), k2 = r2 != null ? keyOf(r[r2], r2) : '', rk = k1 + '\u0001' + k2;
+      if (rowIdx[rk] == null) { rowIdx[rk] = rowsK.length; rowsK.push({ k1: k1, k2: k2, rk: rk }); }
+      if (ck != null) { var kc = keyOf(r[ck], ck); if (colIdx[kc] == null) { colIdx[kc] = colsK.length; colsK.push(kc); } var v = vcs[0] >= 0 ? K.num(r[vcs[0]]) : null; [rk + '\u0002' + kc, rk + '\u0002*', '*\u0002' + kc, '*\u0002*'].forEach(function (key) { put(acc(key), v); }); }
+      else vcs.forEach(function (vc) { var v2 = vc >= 0 ? K.num(r[vc]) : null; [rk + '\u0002' + vc, '*\u0002' + vc].forEach(function (key) { put(acc(key), v2); }); });
+    });
+    var val = function (a) { if (!a || !a.n) return null; var v = agg === 'sum' ? a.s : agg === 'cnt' ? a.n : agg === 'avg' ? a.s / a.n : agg === 'max' ? a.mx : a.mn; if (agg !== 'cnt' && div > 1) v = Math.floor(v / div); return v; };
+    var heads = ck != null ? colsK.slice() : vcs.map(function (vc) { return vc >= 0 ? cols[vc].n : '개수'; });
+    var keysC = ck != null ? colsK : vcs;
+    if (ck != null) { if ($('sort').value !== 'orig') { var order = colsK.slice().sort(function (a, b) { return a.localeCompare(b, 'ko', { numeric: true }); }); heads = order; keysC = order; } }
+    var sortRows = rowsK.slice(), mainKey = ck != null ? '*' : vcs[0];
+    if ($('sort').value === 'name') sortRows.sort(function (a, b) { return a.k1.localeCompare(b.k1, 'ko', { numeric: true }) || a.k2.localeCompare(b.k2, 'ko', { numeric: true }); });
+    else if ($('sort').value === 'big') { var tot1 = {}; rowsK.forEach(function (o) { tot1[o.k1] = (tot1[o.k1] || 0) + (val(cell[o.rk + '\u0002' + mainKey]) || 0); }); sortRows.sort(function (a, b) { return (tot1[b.k1] - tot1[a.k1]) || a.k1.localeCompare(b.k1, 'ko') || (val(cell[b.rk + '\u0002' + mainKey]) || 0) - (val(cell[a.rk + '\u0002' + mainKey]) || 0); }); }
+    var withTotC = $('totC').checked && ck != null;   // 오른쪽 합계 칸은 칸 기준을 펼쳤을 때만 (서로 다른 값 칸을 더하면 뜻이 없음)
+    var rows = sortRows.map(function (o) {
+      var vals = keysC.map(function (kc) { return val(cell[o.rk + '\u0002' + kc]); });
+      if (withTotC) vals.push(ck != null ? val(cell[o.rk + '\u0002*']) : vals.reduce(function (a, b) { return a + (b || 0); }, 0));
+      return { k1: o.k1, k2: o.k2, vals: vals };
+    });
+    var tot = null;
+    if ($('totR').checked) { tot = keysC.map(function (kc) { return val(cell['*\u0002' + kc]); }); if (withTotC) tot.push(ck != null ? val(cell['*\u0002*']) : tot.reduce(function (a, b) { return a + (b || 0); }, 0)); }
+    var lab = [cols[r1].n].concat(r2 != null ? [cols[r2].n] : []);
+    var aggName = { sum: '합계', cnt: '개수', avg: '평균', max: '최대', min: '최소' }[agg];
+    return { lab: lab, heads: heads.concat(withTotC ? [R_TOT(agg)] : []), rows: rows, tot: tot, two: r2 != null, ck: ck, agg: agg, aggName: aggName, valName: ck != null ? (vcs[0] >= 0 ? cols[vcs[0]].n : '개수') : '', n: body.length, dec: agg === 'avg' ? 1 : null };
+  }
+  function R_TOT(a) { return a === 'sum' || a === 'cnt' ? '합계' : '전체 ' + { avg: '평균', max: '최대', min: '최소' }[a]; }
+  function f(v, R) { return v == null ? '' : K.fmtNum(v, R.dec != null ? R.dec : undefined); }
+  /* 한 표 모델 (미리보기·한글·복사 공통): [[{t, align, gray, bold, rs}]] */
+  function model(R) {
+    var head = R.lab.map(function (l) { return { t: l, gray: true, align: 'center' }; }).concat(R.heads.map(function (hh) { return { t: hh, gray: true, align: 'center' }; }));
+    var out = [head], i = 0;
+    while (i < R.rows.length) {
+      var j = i; if (R.two) while (j + 1 < R.rows.length && R.rows[j + 1].k1 === R.rows[i].k1) j++;
+      for (var k = i; k <= j; k++) {
+        var o = R.rows[k], row = [];
+        if (!R.two) row.push({ t: o.k1, align: 'center' });
+        else { if (k === i) row.push({ t: o.k1, align: 'center', rs: j - i + 1 }); row.push({ t: o.k2, align: 'center' }); }
+        o.vals.forEach(function (v, vi) { row.push({ t: f(v, R), align: 'right', bold: R.ck != null && $('totC').checked && vi === o.vals.length - 1 }); });
+        out.push(row);
+      }
+      i = j + 1;
+    }
+    if (R.tot) { var tr = [{ t: R.aggName === '합계' || R.aggName === '개수' ? '합계' : '전체 ' + R.aggName, gray: true, align: 'center', cs: R.lab.length }]; R.tot.forEach(function (v) { tr.push({ t: f(v, R), align: 'right', bold: true }); }); out.push(tr); }
+    return out;
+  }
+  function run() {
+    if (!src) return;
+    var ck = $('cK').value !== '';
+    $('valNote').textContent = ck ? '— 칸 기준을 고르면 첫 번째 값 칸 하나만 씁니다' : '';
+    var R = compute(); last = R;
+    var M = model(R), h = '<table>';
+    M.forEach(function (r, ri) { var isTot = R.tot && ri === M.length - 1; h += '<tr' + (isTot ? ' class="tot"' : '') + '>' + r.map(function (c) { var tag = ri === 0 ? 'th' : 'td'; return '<' + tag + (c.rs > 1 ? ' rowspan="' + c.rs + '"' : '') + (c.cs > 1 ? ' colspan="' + c.cs + '"' : '') + ' class="' + (c.align === 'right' ? 'n' : '') + (c.bold && !isTot ? ' tot' : '') + '">' + esc(c.t) + '</' + tag + '>'; }).join('') + '</tr>'; });
+    $('pv').innerHTML = h + '</table>';
+    $('sum').textContent = '원래 ' + R.n + '줄 → ' + R.rows.length + '줄 × ' + (R.lab.length + R.heads.length) + '칸' + (R.ck != null ? ' · 값: ' + R.valName + ' ' + R.aggName : ' · ' + R.aggName);
+    if (!$('unit').value && $('div').value !== '1') $('unit').placeholder = $('div').value === '1000' ? '(단위: 천 원)' : '(단위: 만 원)';
+  }
+  ['r1', 'r2', 'cK', 'dUnit', 'agg', 'sort', 'div', 'totR', 'totC', 'skipSum'].forEach(function (id) { $(id).addEventListener('change', run); });
+  function title() { return $('title').value.trim() || $('title').placeholder.replace(/^예:\s*/, ''); }
+  function widthsMm(M, total) { var W = M[0].reduce(function (a, c) { return a + (c.cs || 1); }, 0), w = []; for (var c = 0; c < W; c++) w[c] = 4; M.forEach(function (r) { var c = 0; r.forEach(function (x) { if (!x.cs || x.cs === 1) w[c] = Math.max(w[c], Math.min(30, K.vlen(x.t) + 2)); c += x.cs || 1; }); }); var s = w.reduce(function (a, b) { return a + b; }, 0); return w.map(function (x) { return Math.round(x / s * total * 10) / 10; }); }
+  /* 세로 병합이 있는 줄은 Hwpx.textDoc 규칙대로 (아래 줄에서 그 칸 뺌) — model이 이미 그렇게 만듦 */
+  $('dlH').onclick = function () {
+    if (!last) return; var M = model(last), cnt = M[0].length, land = cnt > 8, W = land ? Math.max(+$('bodyW').value || 0, 257) : (+$('bodyW').value || 170);
+    if (land && W > 257) W = 257;
+    var rows = M.map(function (r, ri) { return r.map(function (c) { var o = { t: c.t, align: c.align, style: ri === 0 || c.gray || c.bold ? 'label' : 'cap' }; if (c.gray) o.gray = true; if (c.rs > 1) o.rs = c.rs; if (c.cs > 1) o.cs = c.cs; return o; }); });
+    var bl = [{ k: 'p', t: title(), align: 'center', style: 'sub' }];
+    var u = $('unit').value.trim() || ($('div').value !== '1' ? $('unit').placeholder : ''); if (u) bl.push({ k: 'p', t: u, align: 'right', style: 'cap' });
+    bl.push({ k: 'table', widths: widthsMm(M, W), rows: rows, h: 7 });
+    O.download(K.fileSafe(title()) + '.hwpx', Hwpx.textDoc(bl, title(), { bodyW: W, landscape: land })); O.toast('한글 파일을 내려받았습니다.');
+  };
+  $('cpH').onclick = function () { if (!last) return; var M = model(last); K.copyHtml(K.hwpTableHtml(M, widthsMm(M, +$('bodyW').value || 170), 9), M.map(function (r) { return r.map(function (c) { return c.t; }).join('\t'); }).join('\n')); };
+  $('dlX').onclick = function () {
+    if (!last) return; var R = last, head = R.lab.concat(R.heads), body = [], merges = [];
+    R.rows.forEach(function (o) { body.push([{ v: o.k1, s: 'text' }].concat(R.two ? [{ v: o.k2, s: 'text' }] : []).concat(o.vals.map(function (v) { return v == null ? { v: '', s: 'right' } : { v: R.dec != null ? Math.round(v * 10) / 10 : v, s: R.dec != null ? 'gen' : 'num' }; }))); });
+    if (R.tot) body.push([{ v: R.tot.length && (R.agg === 'sum' || R.agg === 'cnt') ? '합계' : '전체 ' + R.aggName, s: 'sumL' }].concat(R.two ? [{ v: '', s: 'sumL' }] : []).concat(R.tot.map(function (v) { return { v: v == null ? '' : (R.dec != null ? Math.round(v * 10) / 10 : v), s: 'sumN' }; })));
+    var u = $('unit').value.trim() || ($('div').value !== '1' ? $('unit').placeholder : '');
+    var sh = K.bookSheet('집계표', head, body, [title()].concat(u ? [u] : []));
+    O.download(K.fileSafe(title()) + '.xlsx', Xlsxw.book(sh)); O.toast('엑셀을 내려받았습니다.');
+  };
+  function sample() {
+    var units = ['가나팀', '다라팀', '마바팀', '사아팀'], rows = [['2026년 급여 지급 내역(예시)'], [], ['지급일', '부서', '성명', '고용형태', '근무일수', '급여']], kinds = ['정규직', '계약직', '시간제'];
+    var NM = ['김하늘', '이바다', '박구름', '최별', '정나무', '한들꽃', '오솔길', '윤햇살', '서은빛', '장마루', '문초록', '배노을'];
+    for (var m = 7; m <= 10; m++) for (var i = 0; i < 12; i++) { if ((i + m) % 7 === 0) continue; rows.push([m === 10 ? '2026-10-31' : '2026-' + String(m).padStart(2, '0') + '-' + (m === 9 ? '30' : '31'), units[i % 4], NM[i], kinds[i % 3], 15 + (i * 5 + m) % 8, 1100000 + ((i * 37 + m * 11) % 50) * 10000]); }
+    return K.aoaFile('급여 지급 내역(예시).xlsx', rows, function (ws) { Object.keys(ws).forEach(function (a) { if (/^F\d+$/.test(a) && typeof ws[a].v === 'number') ws[a].z = '#,##0'; }); });
+  }
+  window._sum = { compute: compute, model: model, run: run };
+})();
+</script>
+</body>
+</html>

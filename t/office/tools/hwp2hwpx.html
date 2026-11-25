@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HWP → HWPX 바꾸기 — 칼퇴용 뚝딱 사무도구</title>
+
+
+<link rel="stylesheet" href="../style.css?v=2">
+<style>
+table.list{border-collapse:collapse;width:100%;font-size:.88rem}
+table.list th,table.list td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:middle}
+table.list th{color:var(--muted);font-weight:600;font-size:.8rem}
+table.list td.n{text-align:right;white-space:nowrap}
+table.list td.path{color:var(--muted);font-size:.8rem}
+.st{font-weight:700;white-space:nowrap}
+.st.ok{color:var(--ok)}.st.bad{color:#C9302C}.st.skip{color:var(--muted);font-weight:600}.st.run{color:var(--blue)}
+.prog{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+.big{font-size:1.35rem;font-weight:800;margin:0 0 6px}
+.why{border-left:4px solid var(--blue);background:var(--soft);border-radius:8px;padding:10px 12px;margin:10px 0 0;font-size:.9rem}
+.why b{color:var(--blue)}
+</style>
+<link rel="stylesheet" href="../../../frame.css">
+<script src="../../../frame.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header id="top"></header>
+  <p class="sub">옛 한글 파일(<b>.hwp</b>)을 서식 그대로 <b>.hwpx</b>로 바꿉니다. 글꼴·문단·표·그림·머리말까지 옮기고, <b>여러 개나 폴더째</b> 한꺼번에 바꿉니다. <span class="hint">파일은 이 브라우저 안에서만 바꾸고 어디로도 보내지 않습니다.</span></p>
+  <div class="why"><b>왜 hwpx로?</b> 공직자 통합메일은 2026년 10월부터 hwp 첨부를 막고, 정부는 공공문서를 hwpx로 바꾸는 중입니다. hwpx는 국가표준 개방형 형식이라 AI·다른 프로그램도 내용을 읽을 수 있습니다. 한 개라면 한글에서 「다른 이름으로 저장 → 파일 형식 HWPX」도 됩니다 — 이 도구는 <b>많은 파일을 한 번에</b> 바꿀 때 편합니다.</div>
+
+  <section class="panel" style="margin-top:12px">
+    <div class="step"><span class="n">1</span><h2>hwp 파일 넣기</h2></div>
+    <div class="drop" id="drop">
+      <b>hwp 파일이나 폴더를 여기에 끌어다 놓기</b>
+      <div class="hint" style="margin-bottom:8px">여러 개·폴더째 됩니다 (폴더 안의 폴더 구조는 그대로 받음) · 이미 hwpx인 파일은 건너뜁니다</div>
+      <label class="btn"><input type="file" id="file" accept=".hwp" multiple hidden>파일 고르기</label>
+      <label class="btn"><input type="file" id="dir" webkitdirectory hidden>폴더 고르기</label>
+      <button type="button" class="btn" id="sample">예시 hwp로 해 보기</button>
+    </div>
+    <p class="info hint" id="info" style="margin:8px 0 0"></p>
+  </section>
+
+  <section class="panel" id="p2" hidden>
+    <div class="step"><span class="n">2</span><h2>바꾸기</h2></div>
+    <div class="row"><button type="button" class="btn main" id="go">hwpx로 바꾸기</button><span class="hint" id="cnt"></span></div>
+    <div class="prog" id="prog" hidden><i></i></div>
+    <div class="scroll" style="margin-top:10px"><table class="list" id="list"></table></div>
+  </section>
+
+  <section class="panel" id="p3" hidden>
+    <div class="step"><span class="n">3</span><h2>받기</h2></div>
+    <p class="big" id="res"></p>
+    <div class="row">
+      <button type="button" class="btn main" id="dlZip">한 번에 받기 (zip)</button>
+      <button type="button" class="btn" id="dlEach">하나씩 받기</button>
+    </div>
+    <p class="hint" style="margin:8px 0 0">원래 hwp는 그대로 두고 같은 이름의 .hwpx로 받습니다. zip 안에는 넣은 폴더 구조가 그대로 들어 있습니다. <b>중요한 문서는 한 번 열어 쪽 나눔을 확인해 주세요</b> — 글은 그대로 옮겨지지만, 긴 문서는 줄 나눔 차이로 쪽 수가 1쪽쯤 달라질 수 있습니다.</p>
+  </section>
+
+  <section class="panel">
+    <h2>안 바뀌는 파일</h2>
+    <ul class="hint" style="margin:0;padding-left:18px">
+      <li><b>암호가 걸린 문서·배포용 문서</b>는 바꾸지 못합니다. 한글에서 열어 「다른 이름으로 저장 → HWPX」로 저장해 주세요.</li>
+      <li><b>아주 옛날 한글(3.x, 1990년대)</b> 파일도 한글에서 직접 저장해 주세요.</li>
+      <li>확장자만 hwp이고 속은 hwpx인 파일은 이름만 .hwpx로 바꿔 드립니다.</li>
+    </ul>
+    <p class="hint" style="margin:10px 0 0">변환 엔진: 광진구청 류승인 주무관이 공개한 <a href="https://github.com/chrisryugj/kordoc" target="_blank" rel="noopener">kordoc(코닥)</a>의 HWP→HWPX 변환 부분(MIT 라이선스)을 브라우저에서 돌도록 묶어 썼습니다. 함께 쓴 공개 프로그램의 라이선스는 <a href="../lib/kordoc-conv.LICENSES.txt" target="_blank" rel="noopener">여기</a>에 있습니다.</p>
+  </section>
+  
+</div>
+<script src="../../../lib/jszip.min.js"></script>
+<script src="../lib/kordoc-conv.js?v=2"></script>
+<script src="../core.js?v=7"></script>
+<script>
+(function () {
+  var O = Office, $ = O.$, esc = O.esc;
+  O.header('hwp2hwpx');
+  var items = [], seq = 0;
+  /* 파일 첫 바이트로 종류 알아보기: OLE(hwp 5.x) / zip(이미 hwpx) / 「HWP Document File」(3.x) */
+  function kindOf(u8) {
+    if (u8[0] === 0xD0 && u8[1] === 0xCF && u8[2] === 0x11 && u8[3] === 0xE0) return 'hwp5';
+    if (u8[0] === 0x50 && u8[1] === 0x4B) return 'zip';
+    var head = ''; for (var i = 0; i < 20 && i < u8.length; i++) head += String.fromCharCode(u8[i]);
+    if (/^HWP Document File/.test(head)) return 'hwp3';
+    return 'other';
+  }
+  function relOf(f) { return f.relPath || f.webkitRelativePath || f.name; }
+  function outName(rel) { return rel.replace(/\.hwp$/i, '') + '.hwpx'; }
+  function add(files) {
+    var have = {}; items.forEach(function (it) { have[it.rel + '|' + it.size] = 1; });
+    var hw = files.filter(function (f) { return /\.hwp$/i.test(f.name); });
+    var px = files.filter(function (f) { return /\.hwpx$/i.test(f.name); }).length;
+    if (!hw.length) { O.toast(px ? '이미 hwpx인 파일입니다. hwp 파일을 넣어 주세요.' : 'hwp 파일을 넣어 주세요.'); return; }
+    var n = 0;
+    hw.forEach(function (f) { var k = relOf(f) + '|' + f.size; if (have[k]) return; have[k] = 1; items.push({ id: ++seq, file: f, rel: relOf(f), size: f.size, st: 'wait' }); n++; });
+    $('info').textContent = 'hwp ' + items.length + '개' + (px ? ' · 이미 hwpx인 ' + px + '개는 건너뜀' : '') + (hw.length - n ? ' · 같은 파일 ' + (hw.length - n) + '개는 한 번만' : '');
+    $('p2').hidden = false; list();
+  }
+  var ST = { wait: ['skip', '대기'], run: ['run', '바꾸는 중…'], ok: ['ok', '✓ 바꿈'], rename: ['ok', '✓ 이름만 바꿈'], bad: ['bad', '✕ 못 바꿈'] };
+  function list() {
+    var h = '<tr><th>파일</th><th class="n">크기</th><th>결과</th><th class="n">hwpx</th><th></th></tr>';
+    items.forEach(function (it) {
+      var s = ST[it.st], parts = it.rel.split('/'), nm = parts.pop();
+      h += '<tr><td>' + esc(nm) + (parts.length ? '<div class="path">' + esc(parts.join(' / ')) + '</div>' : '') + '</td><td class="n">' + O.fmtSize(it.size) + '</td><td><span class="st ' + s[0] + '">' + s[1] + '</span>' + (it.msg ? '<div class="hint">' + esc(it.msg) + '</div>' : '') + '</td><td class="n">' + (it.out ? O.fmtSize(it.out.length) : '') + '</td><td>' + (it.out ? '<button type="button" class="btn" data-dl="' + it.id + '">받기</button>' : '') + '</td></tr>';
+    });
+    $('list').innerHTML = h;
+    $('list').querySelectorAll('[data-dl]').forEach(function (b) { b.onclick = function () { var it = items.filter(function (x) { return x.id === +b.dataset.dl; })[0]; if (it) O.download(outName(it.rel).split('/').pop(), it.out, 'application/hwp+zip'); }; });
+    var todo = items.filter(function (x) { return x.st === 'wait'; }).length;
+    $('cnt').textContent = todo ? '바꿀 파일 ' + todo + '개' : '';
+    $('go').disabled = !todo;
+  }
+  function why(e) {
+    var m = String(e && e.message || e || '');
+    if (/암호|encrypt|password|crypt|cipher|배포/i.test(m)) return '암호·배포용 문서 같습니다. 한글에서 「다른 이름으로 저장 → HWPX」로 저장해 주세요.';
+    return '이 파일은 바꾸지 못했습니다' + (m ? ' (' + m.slice(0, 80) + ')' : '') + '. 한글에서 「다른 이름으로 저장 → HWPX」로 저장해 주세요.';
+  }
+  $('go').onclick = function () {
+    var todo = items.filter(function (x) { return x.st === 'wait'; }), i = 0, t0 = Date.now();
+    if (!todo.length) return;
+    if (!window.KordocConv) { O.toast('변환 부품을 읽지 못했습니다. 인터넷 연결을 확인하고 새로 고침해 주세요.'); return; }
+    $('go').disabled = true; $('prog').hidden = false;
+    (function next() {
+      $('prog').firstChild.style.width = Math.round(i / todo.length * 100) + '%';
+      if (i >= todo.length) { $('go').disabled = false; done(Date.now() - t0); return; }
+      var it = todo[i++]; it.st = 'run'; list();
+      O.readBuf(it.file).then(function (buf) {
+        var u8 = new Uint8Array(buf), k = kindOf(u8);
+        if (k === 'zip') { it.out = u8; it.st = 'rename'; it.msg = '속은 이미 hwpx였습니다'; return; }
+        if (k === 'hwp3') throw new Error('한글 3.x(옛 형식) 파일입니다');
+        if (k !== 'hwp5') throw new Error('한글 파일이 아닌 것 같습니다');
+        return window.KordocConv.hwpToHwpx(u8).then(function (out) { it.out = out instanceof Uint8Array ? out : new Uint8Array(out); it.st = 'ok'; it.msg = ''; });
+      }).catch(function (e) { it.st = 'bad'; it.msg = /3\.x|아닌 것/.test(e && e.message) ? e.message + ' — 한글에서 「다른 이름으로 저장 → HWPX」로 저장해 주세요.' : why(e); })
+        .then(function () { list(); setTimeout(next, 0); });
+    })();
+  };
+  function done(ms) {
+    var ok = items.filter(function (x) { return x.out; }), bad = items.filter(function (x) { return x.st === 'bad'; });
+    $('p3').hidden = !ok.length;
+    $('res').textContent = 'hwpx ' + ok.length + '개 완성' + (bad.length ? ' · 못 바꾼 파일 ' + bad.length + '개' : '') + ' (' + (ms / 1000).toFixed(1) + '초)';
+    $('dlZip').hidden = ok.length < 2; $('dlEach').textContent = ok.length < 2 ? 'hwpx 받기' : '하나씩 받기';
+    if (bad.length && !ok.length) O.toast('바꾼 파일이 없습니다. 표의 이유를 확인해 주세요.');
+  }
+  $('dlZip').onclick = function () {
+    var ok = items.filter(function (x) { return x.out; }); if (!ok.length) return;
+    var z = new JSZip(), used = {};
+    ok.forEach(function (it) { var n = outName(it.rel), b = n, k = 2; while (used[n]) n = b.replace(/\.hwpx$/, ' (' + (k++) + ').hwpx'); used[n] = 1; z.file(n, it.out); });
+    z.generateAsync({ type: 'blob', compression: 'STORE' }).then(function (blob) { O.download('hwpx로 바꾼 파일_' + O.today() + '.zip', blob); });
+  };
+  $('dlEach').onclick = function () {
+    var ok = items.filter(function (x) { return x.out; }); if (!ok.length) return;
+    if (ok.length > 20 && !confirm(ok.length + '개 파일을 하나씩 내려받습니다. 브라우저가 「여러 파일 받기 허용」을 물으면 허용해 주세요. 계속할까요?')) return;
+    ok.forEach(function (it, i) { setTimeout(function () { O.download(outName(it.rel).split('/').pop(), it.out, 'application/hwp+zip'); }, i * 400); });
+  };
+  O.bindDrop($('drop'), $('file'), add);
+  $('dir').addEventListener('change', function () { add([].slice.call(this.files)); this.value = ''; });
+  $('sample').onclick = function () {
+    fetch('sample/sample.hwp').then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) {
+      add([new File([b], '부서별 월별 급여 합계(예시).hwp', { type: 'application/x-hwp' })]);
+    }).catch(function () { O.toast('예시 파일을 읽지 못했습니다.'); });
+  };
+  window._h2x = { add: add, items: function () { return items; } };
+})();
+</script>
+</body>
+</html>

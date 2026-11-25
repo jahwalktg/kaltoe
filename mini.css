@@ -1,0 +1,50 @@
+/* 책상 위 작은 창 */
+.mini{display:flex;flex-direction:column;gap:10px;padding:14px;min-width:0;font-size:14px}
+.mini button,.mini input{font:inherit;color:inherit}
+.mini button{cursor:pointer}
+.mini [hidden]{display:none!important}
+.mi-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.mi-clock{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.mi-date{color:var(--muted);font-weight:600}
+.mi-go{display:flex;align-items:baseline;gap:8px}
+.mi-gl{color:var(--muted)}
+.mi-go b{font-size:18px;color:var(--go);font-variant-numeric:tabular-nums}
+.mi-bar{height:8px;border-radius:9px;background:var(--soft);overflow:hidden}
+.mi-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#5AA9E6,#F6A945 70%,#EE5D3A)}
+.mi-hours summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+.mi-hr{display:flex;flex-wrap:wrap;gap:6px 12px;padding-top:6px}
+.mi-hr input,.mi-add input{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 7px}
+.mi-cal{border-top:1px solid var(--line);padding-top:8px}
+.mi-ct{display:flex;align-items:center;justify-content:space-between}
+.mini .ib,.mini .lk,.mini .mi-ym{background:none;border:0;border-radius:8px}
+.mini .ib{width:32px;height:32px;font-size:17px;color:var(--muted)}
+.mini .ib:hover,.mini .mi-ym:hover{background:var(--soft)}
+.mini .mi-ym{font-weight:700;padding:4px 10px}
+.mini .lk{color:var(--muted);text-decoration:underline;padding:2px 4px;font-size:12.5px}
+.mi-grid{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}
+.mi-grid .wd{font-size:11.5px;color:var(--muted);padding:3px 0}
+.mini .dd{position:relative;border:0;background:none;height:29px;border-radius:8px;padding:0;font-variant-numeric:tabular-nums}
+.mini .dd:hover{background:var(--soft)}
+.mini .sun{color:var(--sun)}.mini .sat{color:var(--sat)}
+.mini .dd.today{background:var(--ink);color:var(--bg);font-weight:800}
+.mini .dd.pick{outline:2px solid var(--go);outline-offset:-2px}
+.mini .dd.mk::after{content:"";position:absolute;left:50%;bottom:2px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--go)}
+.mi-memo{border-top:1px solid var(--line);padding-top:10px;min-height:0;display:flex;flex-direction:column;gap:7px}
+.mi-mh{display:flex;justify-content:space-between;align-items:center;min-height:22px}
+.mi-add{display:flex;gap:6px}
+.mi-add input{flex:1;min-width:0}
+.mini .mi-plus{border:0;border-radius:8px;background:var(--ink);color:var(--bg);font-weight:700;padding:5px 12px;white-space:nowrap}
+.mi-memo ul{list-style:none;margin:0;padding:0;overflow:auto;max-height:200px}
+.mi-memo li{display:flex;align-items:center;border-radius:8px}
+.mi-memo li:hover{background:var(--soft)}
+.mi-memo label{flex:1;min-width:0;display:flex;gap:7px;align-items:flex-start;padding:5px 4px;cursor:pointer}
+.mi-memo label span{flex:1;min-width:0;overflow-wrap:anywhere}
+.mi-memo input[type=checkbox]{margin:3px 0 0;accent-color:var(--go)}
+.mi-memo small{color:var(--muted);white-space:nowrap}
+.mi-memo li.done span{text-decoration:line-through;color:var(--muted)}
+.mini .none{color:var(--muted);font-size:13px;margin:0;padding:4px}
+.mi-fav{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.mini .mi-tool{border:1px solid var(--line);border-left:4px solid var(--c);border-radius:8px;background:var(--bg);padding:5px 9px;font-size:13px}
+.mini .mi-tool:hover{background:var(--soft)}
+body.mini-win{margin:0;background:var(--surface);color:var(--ink);font-family:var(--font);overflow:auto}
+body.mini-win .mi-memo ul{max-height:none}
